@@ -10,6 +10,7 @@ import {
 } from "@aws-amplify/ui-react";
 import Amplify, { API } from "aws-amplify";
 import React, { useEffect, useState } from "react";
+import Sample from "./SamplePages/SimpleStartPage"
 
 const myAPI = "api747c26ec";
 const path = "/customer";
@@ -62,6 +63,7 @@ function App({ signOut }) {
           );
         })}
       </div>
+      <Sample />
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );
