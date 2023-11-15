@@ -1,9 +1,9 @@
-import Amplify, { API } from 'aws-amplify'
-import React, { useEffect, useState } from 'react'
+import Amplify, { API } from "aws-amplify";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const myAPI = "api747c26ec"
-const path = '/customer'; 
+const myAPI = "api747c26ec";
+const path = "/customer";
 // const options={
 //     headers: {"Content-Type":"application/json"},
 //     respose:true
@@ -13,9 +13,19 @@ const SamplePage = () => {
   const [input, setInput] = useState("");
   const [customers, setCustomers] = useState([]);
 
+  const properChatGptCall = async () => {
+    const apiName = "MyApiName";
+    const path = "/path";
+    const myInit = {
+      body: {}, // replace this with attributes you need
+      headers: {}, // OPTIONAL
+    };
+
+    return await API.post(apiName, path, myInit);
+  };
   const chatGptCall = async () => {
     let resp = "";
-    let prompt = "Who is presiden of India"
+    let prompt = "Who is presiden of India";
     console.log(prompt);
     await axios
       .post(
@@ -33,27 +43,30 @@ const SamplePage = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer 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",
+              "Bearer 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",
           },
         }
       )
       .then((res) => {
         console.log(res);
-        
+
         resp = res;
       });
     console.log(resp.data.choices[0].text);
     let newCustomers = [...customers];
-        newCustomers.push({customerId:prompt, customerName:resp.data.choices[0].text});
-        setCustomers(newCustomers);
-    
+    newCustomers.push({
+      customerId: prompt,
+      customerName: resp.data.choices[0].text,
+    });
+    setCustomers(newCustomers);
+
     return resp.data.choices[0].text;
   };
 
   //Function to fetch from our backend and update customers array
   function getCustomer(e) {
     let customerId = e.input;
-    API.get(myAPI, path+"/"+customerId )
+    API.get(myAPI, path + "/" + customerId)
       .then((response) => {
         console.log(response);
         let newCustomers = [...customers];
