@@ -63,7 +63,7 @@ function App({ signOut }) {
           );
         })}
       </div>
-      <Sample />
+      {/* <Sample /> */}
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );
