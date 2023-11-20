@@ -18,7 +18,7 @@
       "function": {
         "nodeapi6e355eb4": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/nodeapi6e355eb4-455863394b524d4e5067-build.zip"
+          "s3Key": "amplify-builds/nodeapi6e355eb4-723137334f4534344941-build.zip"
         }
       },
       "api": {

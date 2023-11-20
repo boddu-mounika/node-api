@@ -1,49 +1,44 @@
-/**
- * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
- */
+
+
 exports.handler = async (event) => {
-  console.log(event);
-  const customerId = event.pathParameters.customerId;
-  var sql = require("mssql");
-  let res;
-  // config for your database
-  const config = {
-    user: "admin",
-    password: "Helloworld123",
-    server: "pocdb.cbjhfsw0n963.us-east-2.rds.amazonaws.com,1433",
-    database: "StevePoc",
-  };
-  console.log("connecting");
-  // connect to your database
-  sql.connect(config, function (err) {
-    console.log("ey");
-    if (err) console.log(err);
 
-    // create Request object
-    var request = new sql.Request();
+  console.log("point-1")
+  const promise = new Promise(function (resolve, reject) {
+    let sql = require("mssql");
 
-    // query to the database and get the records
-    request.query("select * from customer", function (err, recordset) {
-      if (err) console.log(err);
+    const config = {
+      user: "admin",
+      password: "Helloworld123",
+      server: "pocdb.cbjhfsw0n963.us-east-2.rds.amazonaws.com",
+      port: 1433,
+      options: {
+        database: "StevePoc",
+        encrypt: false,
+      },
+    };
+    console.log("point-2")
+    sql.connect(config, (err) => {
+      if (err) {
 
-      // send records as a response
-      //res.send(recordset);
-      console.log(recordset);
+        console.log("point-3")
+        reject(err);
+      } else {
+        const request = new sql.Request();
+
+        const query = "SELECT * FROM customer";
+        request.query(query, (err, result) => {
+          if (err) {
+            console.log("point-4")
+            reject(err);
+          } else {
+            console.log("point-5")
+            resolve(result);
+          }
+        });
+      }
     });
   });
-  const customer = {
-    customerId: res,
-    customerName: "Customer " + res,
-  };
 
-  const response = {
-    statusCode: 200,
-    //  Uncomment below to enable CORS requests
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "*",
-    },
-    body: JSON.stringify(customer),
-  };
-  return response;
+  console.log("point-6")
+  return promise;
 };
