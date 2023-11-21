@@ -1,8 +1,5 @@
-
-
 exports.handler = async (event) => {
-
-  console.log("point-1")
+  console.log("point-1");
   const promise = new Promise(function (resolve, reject) {
     let sql = require("mssql");
 
@@ -16,11 +13,10 @@ exports.handler = async (event) => {
         encrypt: false,
       },
     };
-    console.log("point-2")
+    console.log("point-2");
     sql.connect(config, (err) => {
       if (err) {
-
-        console.log("point-3")
+        console.log("point-3");
         reject(err);
       } else {
         const request = new sql.Request();
@@ -28,17 +24,26 @@ exports.handler = async (event) => {
         const query = "SELECT * FROM customer";
         request.query(query, (err, result) => {
           if (err) {
-            console.log("point-4")
+            console.log("point-4");
             reject(err);
           } else {
-            console.log("point-5")
-            resolve(result);
+            console.log("point-5");
+            const response = {
+              statusCode: 200,
+              //  Uncomment below to enable CORS requests
+              headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+              },
+              body: JSON.stringify(result),
+            };
+            resolve(response);
           }
         });
       }
     });
   });
 
-  console.log("point-6")
+  console.log("point-6");
   return promise;
 };
