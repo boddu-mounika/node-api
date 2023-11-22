@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1500.0",
+    "cors": "^2.8.5",
     "mssql": "^10.0.1"
   }
 }
