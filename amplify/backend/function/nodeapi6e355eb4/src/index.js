@@ -1,16 +1,32 @@
+// /*
+// Use the following code to retrieve configured secrets from SSM:
+
+const aws = require("aws-sdk");
+
+// Parameters will be of the form { Name: 'secretName', Value: 'secretValue', ... }[]
+// */
 exports.handler = async (event) => {
+  const { Parameters } = await new aws.SSM()
+    .getParameters({
+      Names: ["DB_USERNAME", "DB_PASS"].map(
+        (secretName) => process.env[secretName]
+      ),
+      WithDecryption: true,
+    })
+    .promise();
+  console.log(Parameters);
   console.log("point-1");
   const promise = new Promise(function (resolve, reject) {
     let sql = require("mssql");
 
     const config = {
-      user: "admin",
-      password: "Helloworld123",
+      user: Parameters[1].Value,
+      password: Parameters[0].Value,
       server: "pocdb.cbjhfsw0n963.us-east-2.rds.amazonaws.com",
       port: 1433,
       options: {
         database: "StevePoc",
-        encrypt: false,
+        encrypt:false
       },
     };
     console.log("point-2");
@@ -41,7 +57,7 @@ exports.handler = async (event) => {
           }
         });
       }
-    });
+    })
   });
 
   console.log("point-6");
