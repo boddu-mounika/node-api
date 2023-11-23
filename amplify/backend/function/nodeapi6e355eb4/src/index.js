@@ -38,7 +38,7 @@ exports.handler =async (event) => {
       } else {
         const request = new sql.Request();
 
-        const query = "SELECT * FROM customer";
+        const query = "SELECT * FROM cases";
         request.query(query, (err, result) => {
           if (err) {
             reject(err);
