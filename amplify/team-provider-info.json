@@ -23,7 +23,7 @@
         },
         "uploadfile": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/uploadfile-7043687158544f6c6b79-build.zip"
+          "s3Key": "amplify-builds/uploadfile-464c6638716c556d4233-build.zip"
         }
       },
       "api": {
