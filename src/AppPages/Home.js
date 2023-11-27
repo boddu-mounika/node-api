@@ -348,12 +348,12 @@ export default function Home(props) {
     const path = "/upload";
     const file = event.target.files[0];
     const formData = new FormData();
-    
+    console.log(file);
     formData.append("pdfFile", file);
     console.log(formData)
     //await axios
     //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
-    await await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData, {})
+    await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData)
       .then((response) => {
         console.log(response);
         //setPdfContent(response.data);
