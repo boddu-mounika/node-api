@@ -347,26 +347,49 @@ export default function Home(props) {
     //const myAPI = "api747c26ec";
     const path = "/upload";
     const file = event.target.files[0];
-    const formData = new FormData();
-    console.log(file);
-    formData.append("pdfFile", file);
-    console.log(formData)
-    //await axios
-    //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
-    await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData)
-      .then((response) => {
-        console.log(response);
-        //setPdfContent(response.data);
-
+    const reader = new FileReader();
+    
+    reader.onload = async (event) => {
+      const fileData = event.target.result;
+      try {
+        const response = await API.post(myAPI, path, {
+          body: { pdfData: fileData }
+        });
+        
+        console.log(response); // Handle the response from Lambda
         let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
 
         let text = response.data;
         const myArray = text.split(myregexp);
         setState({ ...state, questions: myArray, inpFile: file });
         console.log(myArray);
-      });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    reader.readAsDataURL(file);
+    // const file = event.target.files[0];
+    // const formData = new FormData();
+    // console.log(file);
+    // formData.append("pdfFile", file);
+    // console.log(formData)
+    // //await axios
+    // //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
+    // await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData)
+    //   .then((response) => {
+    //     console.log(response);
+    //     //setPdfContent(response.data);
+
+    //     let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+
+    //     let text = response.data;
+    //     const myArray = text.split(myregexp);
+    //     setState({ ...state, questions: myArray, inpFile: file });
+    //     console.log(myArray);
+    //   });
     //setState({...state, inpFile:file});
-    console.log(file);
+    // console.log(file);
   };
 
   const onSubmit = async () => {
