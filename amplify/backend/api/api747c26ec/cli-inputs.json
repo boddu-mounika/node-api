@@ -1,9 +1,16 @@
 {
   "version": 1,
   "paths": {
-    "/customer/{customerId}": {
-      "name": "/customer/{customerId}",
+    "/customer": {
+      "name": "/customer",
       "lambdaFunction": "nodeapi6e355eb4",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/upload": {
+      "name": "/upload",
+      "lambdaFunction": "uploadfile",
       "permissions": {
         "setting": "open"
       }

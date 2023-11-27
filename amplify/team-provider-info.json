@@ -18,8 +18,12 @@
       "function": {
         "nodeapi6e355eb4": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/nodeapi6e355eb4-34625a79313777343052-build.zip",
+          "s3Key": "amplify-builds/nodeapi6e355eb4-436848446f76582f696e-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
+        },
+        "uploadfile": {
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/uploadfile-426f464973675a702f6a-build.zip"
         }
       },
       "api": {

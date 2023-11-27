@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { useLocation } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
 import { Link } from "react-router-dom";
@@ -14,6 +14,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import HomeIcon from "@mui/icons-material/Home";
 import SendIcon from '@mui/icons-material/Send';
 import DownloadIcon from "@mui/icons-material/Download";
+import Amplify, { API } from "aws-amplify";
 import {
   PDFDownloadLink,
   Page,
@@ -42,6 +43,8 @@ import {
 
 //import FileUploadComponent from "./UploadFileComponent";
 //import { red } from "@mui/material/colors";
+const myAPI = "api747c26ec";
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -341,11 +344,16 @@ export default function Home(props) {
   };
 
   const handleFileChange = async (event) => {
+    //const myAPI = "api747c26ec";
+    const path = "/upload";
     const file = event.target.files[0];
     const formData = new FormData();
+    
     formData.append("pdfFile", file);
-    await axios
-      .post("http://localhost:5000/upload", formData)
+    console.log(formData)
+    //await axios
+    //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
+    await await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData, {})
       .then((response) => {
         console.log(response);
         //setPdfContent(response.data);

@@ -58,6 +58,7 @@ exports.handler =async (event) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "*",
+        'Content-Type':'text/plain'
       },
       body: JSON.stringify(result),
     };
@@ -68,6 +69,7 @@ exports.handler =async (event) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "*",
+        'Content-Type':'text/plain'
       },
       body: JSON.stringify(e.message),
     };

@@ -33,11 +33,17 @@ export default function BasicTextFields() {
   }, []);
 
     const fetchData = () => {
-      let customerId=1;
-       API.get(myAPI, path + "/" + customerId).then((response) => {
+      //let customerId=1;
+       API.get(myAPI, path,{
+        headers:{
+            'Content-Type':'text/plain'
+        }
+      }).then((response) => {
         console.log(response);
         setState({ ...state, tableData: response.recordset });
-      });
+      }).catch((error) => {
+        console.error(error);
+      });;
     };
 
 //   function fetchData() {
@@ -89,8 +95,8 @@ export default function BasicTextFields() {
           </TableHead>
           <TableBody>
             {state.tableData.map((row) => (
-              <TableRow key={row.ID}>
-                <TableCell>{row.ID}</TableCell>
+              <TableRow key={row.Id}>
+                <TableCell>{row.Id}</TableCell>
                 <TableCell>{`${row.FirstName || ""} ${row.MiddleName || ""} ${
                   row.LastName || ""
                 }`}</TableCell>

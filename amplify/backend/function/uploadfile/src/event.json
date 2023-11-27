@@ -1,0 +1,12 @@
+{
+  "headers": {
+    "Content-Type": "multipart/form-data"
+  },
+  "body": {
+    "files": {
+      "pdfFile": "xxxx"
+    },
+    "key2": "value2",
+    "key3": "value3"
+  }
+}

@@ -9,6 +9,14 @@
           ],
           "category": "function",
           "resourceName": "nodeapi6e355eb4"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "uploadfile"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -46,6 +54,11 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "uploadfile": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
@@ -70,6 +83,22 @@
         {
           "category": "function",
           "resourceName": "nodeapi6e355eb4"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadfile_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadfile_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadfile"
         }
       ]
     }
