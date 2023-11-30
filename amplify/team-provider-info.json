@@ -44,7 +44,7 @@
         },
         "submitcase": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/submitcase-4e7a36794f2b7277484b-build.zip",
+          "s3Key": "amplify-builds/submitcase-45716b4e69436d704c4c-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "insertquestions": {

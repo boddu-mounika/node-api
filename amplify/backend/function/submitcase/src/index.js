@@ -29,6 +29,7 @@ exports.handler = async (event) => {
   let insertedId;
   //let formdata = decodeformdata.decodeformdata(decodedString);
   console.log(formdata);
+  console.log(formdata.FirstName);
   const { Parameters } = await new aws.SSM()
     .getParameters({
       Names: ["DB_USERNAME", "DB_PASS"].map(
@@ -38,7 +39,7 @@ exports.handler = async (event) => {
     })
     .promise();
 
-  //console.log(Parameters);
+  console.log(Parameters);
 
   const promise = new Promise((resolve, reject) => {
     let sql = require("mssql");
@@ -53,11 +54,13 @@ exports.handler = async (event) => {
         encrypt: false,
       },
     };
-
+    console.log("step 2");
     sql.connect(config, (err) => {
       if (err) {
+        console.log(err);
         reject(err);
       } else {
+        console.log("step 3");
         const request = new sql.Request();
         request.input("FirstName", sql.NVarChar, formdata.FirstName);
         request.input("LastName", sql.NVarChar, formdata.LastName);
@@ -70,8 +73,10 @@ exports.handler = async (event) => {
         //let values = JSON.parse(req.body.insertObj);
         request.query(insertionQuery, (err, result) => {
           if (err) {
+            console.log(err);
             reject(err);
           } else {
+            console.log("step 7");
             insertedId = result.recordset[0].id;
             console.log(result.recordset[0].id);
             resolve(insertedId.toString());
@@ -82,6 +87,7 @@ exports.handler = async (event) => {
   });
 
   try {
+    console.log("Hello");
     const result = await promise;
     console.log("Step-1");
     const response = {
@@ -91,7 +97,7 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "*",
         "Content-Type": "text/plain",
       },
-      body: JSON.stringify(insertedId),
+      body: JSON.stringify(result),
     };
     return response;
   } catch (e) {
@@ -102,7 +108,7 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "*",
         "Content-Type": "text/plain",
       },
-      body: JSON.stringify(formdata),
+      body: JSON.stringify(e),
     };
   }
 };
