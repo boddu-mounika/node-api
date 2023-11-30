@@ -44,13 +44,13 @@
         },
         "submitcase": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/submitcase-52783770564d4f636456-build.zip",
+          "s3Key": "amplify-builds/submitcase-4e7a36794f2b7277484b-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "insertquestions": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/insertquestions-4c4c4c34616679514561-build.zip"
+          "s3Key": "amplify-builds/insertquestions-697848652b4f73614f31-build.zip"
         }
       },
       "api": {

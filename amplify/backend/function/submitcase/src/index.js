@@ -13,15 +13,21 @@ const { Parameters } = await (new aws.SSM())
 Parameters will be of the form { Name: 'secretName', Value: 'secretValue', ... }[]
 */
 
+const querystring = require("querystring");
+
 const aws = require("aws-sdk");
 const decodeformdata = require("./decodeformdata");
 
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
-  //const body = JSON.parse(event.body);
-  const decodedString = Buffer.from(event.body, "base64").toString("ascii");
+  const encodedBody = Buffer.from(event.body, "base64").toString("ascii");
+  const formdata = encodedBody.split("&").reduce((acc, curr) => {
+    const [key, value] = curr.split("=");
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
   let insertedId;
-  let formdata = decodeformdata.decodeformdata(decodedString);
+  //let formdata = decodeformdata.decodeformdata(decodedString);
   console.log(formdata);
   const { Parameters } = await new aws.SSM()
     .getParameters({
@@ -66,8 +72,8 @@ exports.handler = async (event) => {
           if (err) {
             reject(err);
           } else {
-             insertedId = result.recordset[0].id;
-        console.log(result.recordset[0].id);
+            insertedId = result.recordset[0].id;
+            console.log(result.recordset[0].id);
             resolve(insertedId.toString());
           }
         });
@@ -96,7 +102,7 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "*",
         "Content-Type": "text/plain",
       },
-      body: JSON.stringify(e),
+      body: JSON.stringify(formdata),
     };
   }
 };

@@ -19,9 +19,12 @@ const decodeformdata = require("./decodeformdata");
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
   //const body = JSON.parse(event.body);
-  const decodedString = Buffer.from(event.body, "base64").toString("ascii");
-  let insertedId;
-  let formdata = decodeformdata.decodeformdata(decodedString);
+  const encodedBody = Buffer.from(event.body, "base64").toString("ascii");
+  const formdata = encodedBody.split("&").reduce((acc, curr) => {
+    const [key, value] = curr.split("=");
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
   console.log(formdata);
   const { Parameters } = await new aws.SSM()
     .getParameters({
