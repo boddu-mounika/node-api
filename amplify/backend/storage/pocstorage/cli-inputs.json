@@ -1,0 +1,14 @@
+{
+  "resourceName": "pocstorage",
+  "policyUUID": "6c8a5345",
+  "bucketName": "pocbucket",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger7661b19e",
+  "groupAccess": {}
+}

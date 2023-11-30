@@ -12,9 +12,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import HomeIcon from "@mui/icons-material/Home";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 import DownloadIcon from "@mui/icons-material/Download";
-import Amplify, { API } from "aws-amplify";
+import Amplify, { API, Storage } from "aws-amplify";
 import {
   PDFDownloadLink,
   Page,
@@ -40,11 +40,11 @@ import {
   Box,
   Icon,
 } from "@mui/material";
+import { StadiumTwoTone } from "@mui/icons-material";
 
 //import FileUploadComponent from "./UploadFileComponent";
 //import { red } from "@mui/material/colors";
 const myAPI = "api747c26ec";
-
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -87,6 +87,7 @@ export default function Home(props) {
     showSendWebLinkDialog: false,
     standardAnswer: "",
     originalAnswer: "",
+    s3bucketfileName:""
   };
   const [state, setState] = useState(initialState);
 
@@ -97,16 +98,20 @@ export default function Home(props) {
       location.state != null &&
       selectedRow !== null
     ) {
+      let path = "/getQuestions";
       console.log(selectedRow); // output: "the-page-id"
       let questionTabledata = [];
       async function getData() {
         const formData = new FormData();
+        console.log(selectedRow.Id);
         formData.append("insertedId", selectedRow.Id.toString());
-        const response = await axios.post(
-          "http://localhost:5000/getQuestions",
-          formData
-        );
-        const tableData = await response.data.recordset;
+        const response = await API.get(myAPI, path + "/" + selectedRow.Id, {
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        });
+        console.log(response);
+        const tableData = await response.recordset;
         console.log(tableData);
         setState({
           ...state,
@@ -343,37 +348,37 @@ export default function Home(props) {
     setState(newState);
   };
 
+  const uploadFile = async (file, filename) => {
+    try {
+      await Storage.put(filename, file);
+
+      console.log("File uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
   const handleFileChange = async (event) => {
     //const myAPI = "api747c26ec";
-    const path = "/upload";
+    const path = "/getfilecontent";
     const file = event.target.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = async (event) => {
-      const fileData = event.target.result;
-      try {
-        const response = await API.post(myAPI, path, {
-          body: { pdfData: fileData }
-        });
-        
-        console.log(response); // Handle the response from Lambda
-        let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+    const filename = (Date.now() + "-" + file.name.replace(/ /g, ''));
 
-        let text = response.data;
-        const myArray = text.split(myregexp);
-        setState({ ...state, questions: myArray, inpFile: file });
-        console.log(myArray);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    uploadFile(file, filename).then(() => {
+      console.log(filename);
+      let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+      const response = API.get(myAPI, path + "/" + filename, {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }).then((response) => {
+        console.log(response);
+        const myArray = response.split(myregexp);
+        setState({ ...state, questions: myArray, inpFile: file, s3bucketfileName:filename });
+        console.log(state);
+      });
+    });
 
-    reader.readAsDataURL(file);
-    // const file = event.target.files[0];
-    // const formData = new FormData();
-    // console.log(file);
-    // formData.append("pdfFile", file);
-    // console.log(formData)
     // //await axios
     // //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
     // await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData)
@@ -393,7 +398,12 @@ export default function Home(props) {
   };
 
   const onSubmit = async () => {
+    
     setState({ ...state, isLoading: true });
+    console.log(state.questions)
+    const path ="/submitcase"
+    const path2 = "/insertquestions"
+    const path3 = "/getquestions"
     const formData = new FormData();
     let insertedQuestions = [];
     let insertedId = 0;
@@ -402,23 +412,27 @@ export default function Home(props) {
       "CASE NO+\\.\\s+[0-9]+\\-[A-Z]+\\-+[0-9]+"
     );
 
+    console.log(CaseNumber);
     //formData.append("insertObj", JSON.stringify(insertObj));
     formData.append("FirstName", state.firstName);
     formData.append("LastName", state.lastName);
     formData.append("MiddleName", state.middleName);
     formData.append("PhoneNumber", state.phoneNumber);
     formData.append("EmailId", state.emailAddress);
-    formData.append("CaseId", CaseNumber);
-    console.log(state.phoneNumber);
+    formData.append("CaseId", CaseNumber)
+    //console.log(state.phoneNumber);
     console.log(formData);
+    let insertObj = [];
     //CaseId
-    await axios
-      .post("http://localhost:5000/test", formData)
+    // await axios
+    //   .post("http://localhost:5000/test", formData)
+      API.post(myAPI,path,formData)
       .then(async (response) => {
+        console.log(response);
         formData.append("InsertedId", response.data);
         insertedId = response.data;
-        console.log(insertedId);
-        let insertObj = [];
+        console.log(state);
+        
         let CaseNo = new RegExp(
           "CASE NO+\\.\\s+[0-9]+\\-[A-Z]+\\-+[0-9]+\\s+[0-9]"
         );
@@ -436,13 +450,13 @@ export default function Home(props) {
         formData.append("insertObj", JSON.stringify(insertObj));
 
         console.log(response);
-        await axios
-          .post("http://localhost:5000/test2", formData)
+        //await axios
+          API.post(myAPI,path2, formData)
           .then(async () => {
             console.log("Succesfully.");
             formData.append("insertedId", insertedId.toString());
-            await axios
-              .post("http://localhost:5000/getQuestions", formData)
+            //await axios
+              API.post(myAPI,path3, formData)
               .then((resultset) => {
                 //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
 
@@ -507,15 +521,14 @@ export default function Home(props) {
           <DialogContentText id="alert-dialog-slide-description">
             <h4>Email:</h4>
             {state.emailAddress}
-            <div style={{marginTop:"30px",float: "right"}}>
-            <Button 
-            variant="contained"
-            onClick = {handleClose}
-             endIcon={<SendIcon />
-            }>
-            
-              Send
-            </Button>
+            <div style={{ marginTop: "30px", float: "right" }}>
+              <Button
+                variant="contained"
+                onClick={handleClose}
+                endIcon={<SendIcon />}
+              >
+                Send
+              </Button>
             </div>
           </DialogContentText>
         </DialogContent>
@@ -760,7 +773,7 @@ export default function Home(props) {
     </React.Fragment>
   ) : (
     <Box
-      sx={{ display: "flex", alignItems: "center", justifyContent:'center'}}
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       <CircularProgress />
     </Box>

@@ -17,6 +17,46 @@
           ],
           "category": "function",
           "resourceName": "uploadfile"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "uploadFileBinary"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getquestions"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getfilecontent"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "submitcase"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "insertquestions"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -50,7 +90,38 @@
     }
   },
   "function": {
+    "S3Trigger7661b19e": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getfilecontent": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getquestions": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "insertquestions": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "nodeapi6e355eb4": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "submitcase": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "uploadFileBinary": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -62,6 +133,86 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_S3Trigger7661b19e_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger7661b19e"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger7661b19e_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger7661b19e"
+        }
+      ]
+    },
+    "AMPLIFY_function_getfilecontent_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getfilecontent"
+        }
+      ]
+    },
+    "AMPLIFY_function_getfilecontent_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getfilecontent"
+        }
+      ]
+    },
+    "AMPLIFY_function_getquestions_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getquestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_getquestions_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getquestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_getquestions_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getquestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_insertquestions_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertquestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_insertquestions_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertquestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_insertquestions_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "insertquestions"
+        }
+      ]
+    },
     "AMPLIFY_function_nodeapi6e355eb4_deploymentBucketName": {
       "usedBy": [
         {
@@ -86,6 +237,46 @@
         }
       ]
     },
+    "AMPLIFY_function_submitcase_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "submitcase"
+        }
+      ]
+    },
+    "AMPLIFY_function_submitcase_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "submitcase"
+        }
+      ]
+    },
+    "AMPLIFY_function_submitcase_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "submitcase"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadFileBinary_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadFileBinary"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadFileBinary_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadFileBinary"
+        }
+      ]
+    },
     "AMPLIFY_function_uploadfile_deploymentBucketName": {
       "usedBy": [
         {
@@ -101,6 +292,23 @@
           "resourceName": "uploadfile"
         }
       ]
+    }
+  },
+  "storage": {
+    "pocstorage": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
+          ],
+          "category": "function",
+          "resourceName": "S3Trigger7661b19e"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
     }
   }
 }

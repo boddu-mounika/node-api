@@ -14,6 +14,41 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/uploadfilebinary": {
+      "name": "/uploadfilebinary",
+      "lambdaFunction": "uploadFileBinary",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/getQuestions/{id}": {
+      "name": "/getQuestions/{id}",
+      "lambdaFunction": "getquestions",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/getfilecontent/{key}": {
+      "name": "/getfilecontent/{key}",
+      "lambdaFunction": "getfilecontent",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/submitcase": {
+      "name": "/submitcase",
+      "lambdaFunction": "submitcase",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/insertquestions": {
+      "name": "/insertquestions",
+      "lambdaFunction": "insertquestions",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }
