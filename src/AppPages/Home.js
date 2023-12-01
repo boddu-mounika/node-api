@@ -87,7 +87,7 @@ export default function Home(props) {
     showSendWebLinkDialog: false,
     standardAnswer: "",
     originalAnswer: "",
-    s3bucketfileName:""
+    s3bucketfileName: "",
   };
   const [state, setState] = useState(initialState);
 
@@ -99,26 +99,25 @@ export default function Home(props) {
       selectedRow !== null
     ) {
       let path = "/getQuestions";
+      let tableData=[];
       console.log(selectedRow); // output: "the-page-id"
       let questionTabledata = [];
       async function getData() {
         const formData = new FormData();
         console.log(selectedRow.Id);
         formData.append("insertedId", selectedRow.Id.toString());
-        const response = await API.get(myAPI, path + "/" + selectedRow.Id, {
+        await API.get(myAPI, path + "/" + selectedRow.Id, {
           headers: {
             "Content-Type": "text/plain",
           },
+        }).then(async (response) => {
+          console.log(response);
+          tableData = await response.recordset;
+          console.log(tableData);
         });
-        console.log(response);
-        const tableData = await response.recordset;
-        console.log(tableData);
         setState({
           ...state,
           questionTable: tableData,
-          // clientName: `${selectedRow.FirstName || ""} ${
-          //   selectedRow.LastName || ""
-          // }`,
           firstName: selectedRow.FirstName,
           lastName: selectedRow.LastName,
           middleName: selectedRow.MiddleName,
@@ -358,11 +357,24 @@ export default function Home(props) {
     }
   };
 
+  const handleDownload = async (filename) => {
+    try {
+      filename = "1701211477646-Def Interrog to Plf.pdf";
+      //Storage.get
+      const response = await Storage.get(filename);
+      console.log(response);
+      //const fileUrl = URL.createObjectURL(response);
+      window.open(response); // Open the file URL in a new tab for download
+    } catch (error) {
+      console.error("Error downloading file", error);
+    }
+  };
+
   const handleFileChange = async (event) => {
     //const myAPI = "api747c26ec";
     const path = "/getfilecontent";
     const file = event.target.files[0];
-    const filename = (Date.now() + "-" + file.name.replace(/ /g, ''));
+    const filename = Date.now() + "-" + file.name.replace(/ /g, "");
 
     uploadFile(file, filename).then(() => {
       console.log(filename);
@@ -374,7 +386,12 @@ export default function Home(props) {
       }).then((response) => {
         console.log(response);
         const myArray = response.split(myregexp);
-        setState({ ...state, questions: myArray, inpFile: file, s3bucketfileName:filename });
+        setState({
+          ...state,
+          questions: myArray,
+          inpFile: file,
+          s3bucketfileName: filename,
+        });
         console.log(state);
       });
     });
@@ -398,12 +415,11 @@ export default function Home(props) {
   };
 
   const onSubmit = async () => {
-    
     setState({ ...state, isLoading: true });
-    console.log(state.questions)
-    const path ="/submitcase"
-    const path2 = "/insertquestions"
-    const path3 = "/getquestions"
+    console.log(state.questions);
+    const path = "/submitcase";
+    const path2 = "/insertquestions";
+    const path3 = "/getQuestions";
     const formData = new FormData();
     let insertedQuestions = [];
     let insertedId = 0;
@@ -419,54 +435,56 @@ export default function Home(props) {
     formData.append("MiddleName", state.middleName);
     formData.append("PhoneNumber", state.phoneNumber);
     formData.append("EmailId", state.emailAddress);
-    formData.append("CaseId", CaseNumber)
+    formData.append("CaseId", CaseNumber);
     //console.log(state.phoneNumber);
     console.log(formData);
     let insertObj = [];
     //CaseId
     // await axios
     //   .post("http://localhost:5000/test", formData)
-      API.post(myAPI,path,formData)
-      .then(async (response) => {
-        console.log(response);
-        formData.append("InsertedId", response.data);
-        insertedId = response.data;
-        console.log(state);
-        
-        let CaseNo = new RegExp(
-          "CASE NO+\\.\\s+[0-9]+\\-[A-Z]+\\-+[0-9]+\\s+[0-9]"
-        );
+    const result = await API.post(myAPI, path, {
+      body: formData,
+    }).then(async (response) => {
+      console.log(response);
+      formData.append("InsertedId", response);
+      insertedId = response;
+      console.log(state);
 
-        for (var i = 1; i < state.questions.length; ++i) {
-          let result = state.questions[i].replace(CaseNo, "");
-          result = result.replace(/\n/g, "");
-          result = result.replace(/'/g, "");
-          result = result.replace(/"/g, "");
-          console.log(result);
-          console.log(i);
-          insertObj.push([response.data, result, i]);
-        }
-        console.log(insertObj);
-        formData.append("insertObj", JSON.stringify(insertObj));
+      let CaseNo = new RegExp(
+        "CASE NO+\\.\\s+[0-9]+\\-[A-Z]+\\-+[0-9]+\\s+[0-9]"
+      );
 
-        console.log(response);
+      for (var i = 1; i < state.questions.length - 1; ++i) {
+        let result = state.questions[i].replace(CaseNo, "");
+        result = result.replace(/\n/g, "");
+        result = result.replace(/'/g, "");
+        result = result.replace(/"/g, "");
+        console.log(result);
+        console.log(i);
+        insertObj.push([response, result, i]);
+      }
+      console.log(insertObj);
+      formData.append("insertObj", JSON.stringify(insertObj));
+
+      console.log(response);
+      //await axios
+      await API.post(myAPI, path2, { body: formData }).then(async () => {
+        console.log("Succesfully.");
+        formData.append("insertedId", insertedId.toString());
         //await axios
-          API.post(myAPI,path2, formData)
-          .then(async () => {
-            console.log("Succesfully.");
-            formData.append("insertedId", insertedId.toString());
-            //await axios
-              API.post(myAPI,path3, formData)
-              .then((resultset) => {
-                //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
 
-                insertedQuestions = resultset.data.recordset;
-              });
-          });
-      })
-      .finally(() => {
-        //setState({...state,isLoading:false});
+        await API.get(myAPI, path3 + "/" + insertedId, {
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        }).then((resultset) => {
+          //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
+          console.log(resultset);
+          insertedQuestions = resultset.recordset;
+        });
       });
+    });
+
     setState({
       ...state,
       isLoading: false,
@@ -647,20 +665,28 @@ export default function Home(props) {
               </Button>
             )}
             {state.questionTable.length > 0 && (
-              <PDFDownloadLink document={<MyDoc />} fileName="CaseDetails.pdf">
-                {({ blob, url, loading, error }) =>
-                  loading ? "Loading document..." : "Download now!"
-                }
+              <Button
+                style={{ marginLeft: "35px", marginTop: "5px" }}
+                variant="outlined"
+                onClick={handleDownload}
+                startIcon={<DownloadIcon />}
+              >
+                Download as pdf
+              </Button>
+              // <PDFDownloadLink document={<MyDoc />} fileName="CaseDetails.pdf">
+              //   {({ blob, url, loading, error }) =>
+              //     loading ? "Loading document..." : "Download now!"
+              //   }
 
-                <Button
-                  style={{ marginLeft: "35px", marginTop: "5px" }}
-                  variant="outlined"
-                  //onClick={MyDoc}
-                  startIcon={<DownloadIcon />}
-                >
-                  download as pdf
-                </Button>
-              </PDFDownloadLink>
+              //   <Button
+              //     style={{ marginLeft: "35px", marginTop: "5px" }}
+              //     variant="outlined"
+              //     //onClick={MyDoc}
+              //     startIcon={<DownloadIcon />}
+              //   >
+              //     download as pdf
+              //   </Button>
+              // </PDFDownloadLink>
             )}
           </Grid>
           {state.createCasePage && !state.showTable && (

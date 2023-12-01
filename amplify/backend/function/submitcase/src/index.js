@@ -20,12 +20,32 @@ const decodeformdata = require("./decodeformdata");
 
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
-  const encodedBody = Buffer.from(event.body, "base64").toString("ascii");
-  const formdata = encodedBody.split("&").reduce((acc, curr) => {
-    const [key, value] = curr.split("=");
-    acc[key] = decodeURIComponent(value);
-    return acc;
-  }, {});
+  const input = Buffer.from(event.body, "base64").toString("ascii");
+  //const formdata = decodeformdata(decodedBody);
+  const boundaryRegex = /^--([^\r\n]+)/;
+  const boundaryMatch = input.match(boundaryRegex);
+  const boundary = boundaryMatch ? boundaryMatch[1] : null;
+  const formdata = {};
+  if (boundary) {
+    // Split the string into separate key-value pairs
+    const keyValuePairs = input
+      .split(`${boundary}--`)[0]
+      .split(`${boundary}\r\n`)
+      .slice(1);
+
+    // Extract the data for each key-value pair
+    
+    keyValuePairs.forEach((pair) => {
+      const match = pair.match(/name="([^"]+)"\r\n\r\n(.+)\r\n/);
+      if (match) {
+        const name = match[1];
+        const value = match[2];
+        formdata[name] = value;
+      }
+    });
+
+    console.log(formdata);
+  }
   let insertedId;
   //let formdata = decodeformdata.decodeformdata(decodedString);
   console.log(formdata);

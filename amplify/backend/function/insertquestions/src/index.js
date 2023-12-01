@@ -19,13 +19,32 @@ const decodeformdata = require("./decodeformdata");
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
   //const body = JSON.parse(event.body);
-  const encodedBody = Buffer.from(event.body, "base64").toString("ascii");
-  const formdata = encodedBody.split("&").reduce((acc, curr) => {
-    const [key, value] = curr.split("=");
-    acc[key] = decodeURIComponent(value);
-    return acc;
-  }, {});
-  console.log(formdata);
+  const input = Buffer.from(event.body, "base64").toString("ascii");
+  //const formdata = decodeformdata(encodedBody);
+  const boundaryRegex = /^--([^\r\n]+)/;
+  const boundaryMatch = input.match(boundaryRegex);
+  const boundary = boundaryMatch ? boundaryMatch[1] : null;
+  const formdata = {};
+  if (boundary) {
+    // Split the string into separate key-value pairs
+    const keyValuePairs = input
+      .split(`${boundary}--`)[0]
+      .split(`${boundary}\r\n`)
+      .slice(1);
+
+    // Extract the data for each key-value pair
+    
+    keyValuePairs.forEach((pair) => {
+      const match = pair.match(/name="([^"]+)"\r\n\r\n(.+)\r\n/);
+      if (match) {
+        const name = match[1];
+        const value = match[2];
+        formdata[name] = value;
+      }
+    });
+
+    console.log(formdata);
+  }
   const { Parameters } = await new aws.SSM()
     .getParameters({
       Names: ["DB_USERNAME", "DB_PASS"].map(
@@ -60,10 +79,17 @@ exports.handler = async (event) => {
         nullable: false,
       });
       table.columns.add("SequenceNumber", sql.Int, { nullable: true });
-      let values = JSON.parse(formdata.insertObj);
+      let validstring = formdata.insertObj.replace(/\\n/g, "\n")
+      .replace(/\\r/g, "\r")
+      .replace(/\\t/g, "\t")
+      .replace(/\\'/g, "'")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\");
+
+      let values = JSON.parse(validstring);
+      console.log(values);
       console.log(formdata.insertObj);
-      console.log(values);
-      console.log(values);
+      
       console.log("1");          
       for (let j = 0; j < values.length; j += 1) {
         //console.log("2");
