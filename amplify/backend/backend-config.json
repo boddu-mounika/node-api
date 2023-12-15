@@ -1,5 +1,25 @@
 {
+  "analytics": {
+    "emailpinpoint": {
+      "providerPlugin": "awscloudformation",
+      "service": "Pinpoint"
+    }
+  },
   "api": {
+    "SmsApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "smsfunction"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "api747c26ec": {
       "dependsOn": [
         {
@@ -57,6 +77,46 @@
           ],
           "category": "function",
           "resourceName": "insertquestions"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "email"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getphonenumber"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "updatechatgptquestion"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "updatequestions"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -90,13 +150,29 @@
     }
   },
   "function": {
+    "Chatgptcall": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "S3Trigger7661b19e": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "email": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
     "getfilecontent": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getphonenumber": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -116,8 +192,26 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "smsfunction": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "submitcase": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updatechatgptquestion": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updatequestions": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -132,7 +226,79 @@
       "service": "Lambda"
     }
   },
+  "notifications": {
+    "emailpinpoint": {
+      "channels": [
+        "Email"
+      ],
+      "service": "Pinpoint"
+    }
+  },
   "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_function_Chatgptcall_chatgptPrompt": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        }
+      ]
+    },
+    "AMPLIFY_function_Chatgptcall_chatgptPromptAnswer": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        }
+      ]
+    },
+    "AMPLIFY_function_Chatgptcall_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        }
+      ]
+    },
+    "AMPLIFY_function_Chatgptcall_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        }
+      ]
+    },
+    "AMPLIFY_function_Chatgptcall_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Chatgptcall"
+        }
+      ]
+    },
     "AMPLIFY_function_S3Trigger7661b19e_deploymentBucketName": {
       "usedBy": [
         {
@@ -149,6 +315,22 @@
         }
       ]
     },
+    "AMPLIFY_function_email_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "email"
+        }
+      ]
+    },
+    "AMPLIFY_function_email_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "email"
+        }
+      ]
+    },
     "AMPLIFY_function_getfilecontent_deploymentBucketName": {
       "usedBy": [
         {
@@ -162,6 +344,30 @@
         {
           "category": "function",
           "resourceName": "getfilecontent"
+        }
+      ]
+    },
+    "AMPLIFY_function_getphonenumber_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getphonenumber"
+        }
+      ]
+    },
+    "AMPLIFY_function_getphonenumber_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getphonenumber"
+        }
+      ]
+    },
+    "AMPLIFY_function_getphonenumber_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getphonenumber"
         }
       ]
     },
@@ -237,6 +443,30 @@
         }
       ]
     },
+    "AMPLIFY_function_smsfunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "smsfunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_smsfunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "smsfunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_smsfunction_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "smsfunction"
+        }
+      ]
+    },
     "AMPLIFY_function_submitcase_deploymentBucketName": {
       "usedBy": [
         {
@@ -258,6 +488,54 @@
         {
           "category": "function",
           "resourceName": "submitcase"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatechatgptquestion_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatechatgptquestion"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatechatgptquestion_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatechatgptquestion"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatechatgptquestion_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatechatgptquestion"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatequestions_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatequestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatequestions_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatequestions"
+        }
+      ]
+    },
+    "AMPLIFY_function_updatequestions_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updatequestions"
         }
       ]
     },
@@ -290,6 +568,30 @@
         {
           "category": "function",
           "resourceName": "uploadfile"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
         }
       ]
     }

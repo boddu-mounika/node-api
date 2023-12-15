@@ -14,7 +14,8 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import HomeIcon from "@mui/icons-material/Home";
 import SendIcon from "@mui/icons-material/Send";
 import DownloadIcon from "@mui/icons-material/Download";
-import Amplify, { API, Storage } from "aws-amplify";
+import { API, Storage } from "aws-amplify";
+import { SES } from "@aws-sdk/client-ses";
 import {
   PDFDownloadLink,
   Page,
@@ -83,6 +84,7 @@ export default function Home(props) {
     questionTable: [],
     chatInitiatedForCase: false,
     caseId: "",
+    caseNumber: "",
     showResponsesDialog: false,
     showSendWebLinkDialog: false,
     standardAnswer: "",
@@ -92,14 +94,16 @@ export default function Home(props) {
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
+    console.log("CALLED>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     const { selectedRow } = location.state;
     if (
       location.state !== undefined &&
       location.state != null &&
       selectedRow !== null
     ) {
+      setState({ ...state, isLoading: true });
       let path = "/getQuestions";
-      let tableData=[];
+      let tableData = [];
       console.log(selectedRow); // output: "the-page-id"
       let questionTabledata = [];
       async function getData() {
@@ -126,6 +130,8 @@ export default function Home(props) {
           chatInitiatedForCase: selectedRow.ChatInitiated,
           createCasePage: false,
           caseId: selectedRow.Id,
+          caseNumber: selectedRow.CaseId,
+          isLoading: false,
         });
       }
       getData();
@@ -239,9 +245,25 @@ export default function Home(props) {
   };
 
   const SendWebLink = async (CaseId) => {
+    setState({...state, isLoading:true});
+    const key = state.caseId + "-" + state.caseNumber.split(" ").join("");
+    const body = `${window.location.origin}/submit/${key}`;
+    console.log(body);
+    const path = "/email";
+    const formData = new FormData();
+    formData.append("emailAddress", "mukkaaditya@gmail.com");
+    formData.append("subject", "Submit form");
+    formData.append("message", body.toString());
+    const result = await API.post(myAPI, path, {
+      headers:{
+        "content-type": 'multipart/form-data'
+      },
+      body: formData,
+    });
     setState({
       ...state,
       showSendWebLinkDialog: true,
+      isLoading:false
     });
   };
 
@@ -345,6 +367,7 @@ export default function Home(props) {
     let newState = { ...state };
     newState[e.target.name] = e.target.value;
     setState(newState);
+    console.log(state);
   };
 
   const uploadFile = async (file, filename) => {
@@ -533,10 +556,10 @@ export default function Home(props) {
         <DialogTitle>{"Select communication channel"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            <h4>SMS: </h4>
-            {state.phoneNumber}
+            <h4>An email hase been sent to user. </h4>
+            {state.emailAddress}
           </DialogContentText>
-          <DialogContentText id="alert-dialog-slide-description">
+          {/* <DialogContentText id="alert-dialog-slide-description">
             <h4>Email:</h4>
             {state.emailAddress}
             <div style={{ marginTop: "30px", float: "right" }}>
@@ -548,7 +571,7 @@ export default function Home(props) {
                 Send
               </Button>
             </div>
-          </DialogContentText>
+          </DialogContentText> */}
         </DialogContent>
       </Dialog>
 

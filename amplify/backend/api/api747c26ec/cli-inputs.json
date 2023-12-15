@@ -49,6 +49,41 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/email": {
+      "name": "/email",
+      "lambdaFunction": "email",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/getphonenumber/{id}": {
+      "name": "/getphonenumber/{id}",
+      "lambdaFunction": "getphonenumber",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/updatechatgptquestion/{id}": {
+      "name": "/updatechatgptquestion/{id}",
+      "lambdaFunction": "updatechatgptquestion",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/Chatgptcall/{question}": {
+      "name": "/Chatgptcall/{question}",
+      "lambdaFunction": "Chatgptcall",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/updateQuestions": {
+      "name": "/updateQuestions",
+      "lambdaFunction": "updatequestions",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

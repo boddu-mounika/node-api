@@ -9,7 +9,8 @@
       "UnauthRoleName": "amplify-amplify3c5e3687be3c4-staging-160721-unauthRole",
       "StackName": "amplify-amplify3c5e3687be3c4-staging-160721",
       "StackId": "arn:aws:cloudformation:us-east-2:351467191860:stack/amplify-amplify3c5e3687be3c4-staging-160721/e4d55520-8307-11ee-a79d-0a1e047b15e5",
-      "AmplifyAppId": "d2u1maonugm0ya"
+      "AmplifyAppId": "d2u1maonugm0ya",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-amplify3c5e3687be3c4-staging-160721-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
@@ -31,7 +32,7 @@
         },
         "getquestions": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/getquestions-76435a693272717a7356-build.zip",
+          "s3Key": "amplify-builds/getquestions-7a763458475068764d6d-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "S3Trigger7661b19e": {
@@ -50,14 +51,61 @@
         "insertquestions": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/insertquestions-76336d69324c63793454-build.zip"
+          "s3Key": "amplify-builds/insertquestions-306b3846774a50795048-build.zip"
+        },
+        "smsfunction": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/smsfunction-6c41564c735348505755-build.zip"
+        },
+        "email": {
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/email-7764726d636d42455442-build.zip"
+        },
+        "getphonenumber": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/getphonenumber-5a306a344e414b464459-build.zip"
+        },
+        "Chatgptcall": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/Chatgptcall-56456a4337307637484e-build.zip",
+          "chatgptPromptAnswer": "Rephrase the below senetence into attorney language:",
+          "chatgptPrompt": "Convert this question into layman language:"
+        },
+        "updatechatgptquestion": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/updatechatgptquestion-5358684f2b48484e664f-build.zip"
+        },
+        "updatequestions": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/updatequestions-38455a36626959327931-build.zip"
         }
       },
       "api": {
-        "api747c26ec": {}
+        "api747c26ec": {},
+        "SmsApi": {}
       },
       "storage": {
         "pocstorage": {}
+      },
+      "analytics": {
+        "Pinpoint": {
+          "Name": "emailpinpoint-staging",
+          "Id": "8cb3ee177d8743a0b9f9b838d9f64988",
+          "Region": "us-east-2"
+        },
+        "emailpinpoint": {}
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "emailpinpoint-staging",
+          "Id": "8cb3ee177d8743a0b9f9b838d9f64988",
+          "Region": "us-east-2"
+        }
       }
     }
   }

@@ -1,7 +1,4 @@
-
-
 const aws = require("aws-sdk");
-const decodeformdata = require("./decodeformdata");
 
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
@@ -18,7 +15,7 @@ exports.handler = async (event) => {
       .slice(1);
 
     // Extract the data for each key-value pair
-    
+
     keyValuePairs.forEach((pair) => {
       const match = pair.match(/name="([^"]+)"\r\n\r\n(.+)\r\n/);
       if (match) {
@@ -54,40 +51,48 @@ exports.handler = async (event) => {
     };
 
     sql.connect(config).then((pool) => {
-      const table = new sql.Table("Questions");
-  
-      table.create = false;
-      table.columns.add("CaseId", sql.NVarChar(100), { nullable: false });
-      table.columns.add("OriginalQuestion", sql.NVarChar(sql.MAX), {
-        nullable: false,
-      });
-      table.columns.add("SequenceNumber", sql.Int, { nullable: true });
-      let validstring = formdata.insertObj.replace(/\\n/g, "\n")
-      .replace(/\\r/g, "\r")
-      .replace(/\\t/g, "\t")
-      .replace(/\\'/g, "'")
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, "\\");
+      const request = new sql.Request();
 
-      let values = JSON.parse(validstring);
-      console.log(values);
-      console.log(formdata.insertObj);
-      
-      console.log("1");          
-      for (let j = 0; j < values.length; j += 1) {
-        //console.log("2");
-        table.rows.add(values[j][0].toString(), values[j][1], values[j][2]);
-      }
-  
-      console.log(table.rows);
-      const request = pool.request();
-      //console.log(values);
-      // // create Request object
-      const results = request.bulk(table);
-      console.log(`line 91: rows affected ${results.rowsAffected}`);
-      resolve(results);
+      // Configure data to be inserted/updated
+      const data = [
+        { id: 1, name: "John Doe" },
+        { id: 2, name: "Jane Smith" },
+      ];
+
+      // Define the table and column names
+      const tableName = "questions";
+      const idColumnName = "Id";
+      const nameColumnName = "StandardAnswer";
+      let tabledata = JSON.parse(formdata.data);
+      //const request = new sql.Request();
+
+      // Generate bulk update query
+      let query = `UPDATE ${tableName} SET ${nameColumnName} = CASE `;
+      let params = [];
+      console.log(tabledata.filter((row) => row.StandardAnswer !== null));
+      const filteredTableData = tabledata.filter(
+        (row) => row.StandardAnswer !== null
+      );
+
+      filteredTableData.forEach((row) => {
+        console.log(row.StandardAnswer);
+        query += `WHEN ${idColumnName} = @id${row.Id} THEN @name${row.Id} `;
+        request.input(`id${row.Id}`, sql.Int, row.Id);
+        request.input(`name${row.Id}`, sql.NVarChar, row.StandardAnswer);
+      });
+      query += `END WHERE ${idColumnName} IN (`;
+      query += filteredTableData.map((row) => `@id${row.Id}`)
+        .join(",");
+      query += ")";
+
+      console.log(query);
+
+      // Execute the bulk update query
+      const result = request.query(query);
+
+      //console.log(`Rows affected: ${result.rowsAffected}`);
+      resolve(result);
     });
-   
   });
 
   try {

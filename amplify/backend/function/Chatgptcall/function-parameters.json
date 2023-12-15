@@ -1,0 +1,16 @@
+{
+  "lambdaLayers": [],
+  "secretNames": [
+    "key"
+  ],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "chatgptPromptAnswer",
+      "environmentVariableName": "CHATGPT_PROMPT_ANSWER"
+    },
+    {
+      "cloudFormationParameterName": "chatgptPrompt",
+      "environmentVariableName": "CHATGPT_PROMPT"
+    }
+  ]
+}

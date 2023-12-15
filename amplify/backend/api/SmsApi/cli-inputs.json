@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "paths": {
+    "/sms": {
+      "name": "/sms",
+      "lambdaFunction": "smsfunction",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    }
+  }
+}

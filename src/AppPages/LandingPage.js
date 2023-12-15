@@ -15,20 +15,26 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Box,
+  CircularProgress
 } from "@mui/material";
 
 const myAPI = "api747c26ec";
 const path = "/customer";
+
+
 
 export default function BasicTextFields() {
   let initialState = {
     rows: [],
     columns: [],
     tableData: [],
+    isLoading:false
   };
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
+    setState({ ...state, isLoading: true });
     fetchData();
   }, []);
 
@@ -40,7 +46,7 @@ export default function BasicTextFields() {
         }
       }).then((response) => {
         console.log(response);
-        setState({ ...state, tableData: response.recordset });
+        setState({ ...state, tableData: response.recordset, isLoading:false });
       }).catch((error) => {
         console.error(error);
       });;
@@ -61,7 +67,7 @@ export default function BasicTextFields() {
 //       });
 //   }
 
-  return (
+return !state.isLoading ? (
     <React.Fragment>
       <Grid item xs={6}>
         {/* <Link to="/">
@@ -113,5 +119,11 @@ export default function BasicTextFields() {
         </Table>
       </TableContainer>
     </React.Fragment>
+  ):(
+    <Box
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <CircularProgress />
+    </Box>
   );
 }

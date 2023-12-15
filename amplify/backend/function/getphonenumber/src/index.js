@@ -35,11 +35,9 @@ exports.handler =async (event) => {
         reject(err);
       } else {
         const request = new sql.Request();
-        request.input("caseId", sql.NVarChar, id);  
+        request.input("id", sql.NVarChar, id);  
       
-        const selectQuery =`select q.Id, q.SequenceNumber,q.MsgSentDateTime,  q.CaseId, q.MsgSent, q.MsgReceived, q.OriginalQuestion ,q.StandardQuestion,q.StandardAnswer as StandardAnswerWeb,  r.StandardAnswer, r.OriginalAnswer from questions q 
-        left outer join responses r on q.Id = r.QuestionId
-        where q.CaseId=@caseId order by q.SequenceNumber asc`;
+        const selectQuery =`select * from cases where id=@id`;
         request.query(selectQuery, (err, result) => {
           if (err) {
             reject(err);

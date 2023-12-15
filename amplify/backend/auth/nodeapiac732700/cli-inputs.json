@@ -2,7 +2,7 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "nodeapiac732700_identitypool_ac732700",
-    "allowUnauthenticatedIdentities": false,
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "nodeapac732700",
     "userPoolName": "nodeapiac732700_userpool_ac732700",
     "autoVerifiedAttributes": [
