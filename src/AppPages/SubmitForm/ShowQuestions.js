@@ -7,17 +7,17 @@ const ShowQuestions = (props) => {
       {props.data.map((question, index) => (
         <div key={index}>
           <h3>{question.OriginalQuestion}</h3>
-          <p>{question.StandardAnswerWeb}</p>
+          {/* <p>{question.StandardAnswerWeb}</p> */}
           <TextField
             id={question.OriginalQuestion}
-            name={question.Id}
+            name={question.Id.toString()}
             label="Your response"
             sx={{ m: 1, width: "120ch" }}
             placeholder="Placeholder"
             multiline
             rows={4}
             onChange={props.handleValueChange}
-            value = {question.StandardAnswerWeb}
+            value = {question.StandardAnswerWeb?question.StandardAnswerWeb:""}
           />
         </div>
       ))}

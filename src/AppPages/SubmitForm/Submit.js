@@ -13,10 +13,12 @@ import {
   Slide,
 } from "@mui/material";
 import ShowQuestions from "./ShowQuestions";
+import Loading from "../ReusableComponents/Loading"
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
+
 
 const Submit = (props) => {
   const { key } = useParams();
@@ -128,10 +130,12 @@ const Submit = (props) => {
   };
 
   const onSubmit = async () => {
+    setState({...state,isLoading:true});
     const path = "/updateQuestions";
     const formData = new FormData();
     formData.append("data", JSON.stringify(state.tableData));
     await API.post(myAPI, path, { body: formData }).then(() => {});
+    setState({...state,isLoading:false, changesMade:false});
   };
 
   const handleClose = () => {
@@ -149,6 +153,8 @@ const Submit = (props) => {
         TransitionComponent={Transition}
         //onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        fullWidth
+        maxWidth="sm"
       >
         <DialogTitle>{"Confirm!"}</DialogTitle>
 
@@ -170,11 +176,13 @@ const Submit = (props) => {
               variant="outlined"
               onChange={handleChange}
               value={state.phoneNumber}
+              style={{width:"80%", marginTop:"10px"}}
             />
             <Button
               variant="contained"
               onClick={checkPhoneNumber}
               disabled={state.phoneNumber.length !== 10}
+              style={{marginLeft:'10px', marginTop:'20px'}}
             >
               Check
             </Button>
@@ -199,15 +207,7 @@ const Submit = (props) => {
       )}
     </React.Fragment>
   ) : (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <CircularProgress />
-    </Box>
+    <Loading />
   );
 };
 

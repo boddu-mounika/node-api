@@ -5,6 +5,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Amplify, { API } from "aws-amplify";
+import Loading from "./ReusableComponents/Loading"
 import {
   IconButton,
   Button,
@@ -120,10 +121,6 @@ return !state.isLoading ? (
       </TableContainer>
     </React.Fragment>
   ):(
-    <Box
-      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-    >
-      <CircularProgress />
-    </Box>
+    <Loading />
   );
 }

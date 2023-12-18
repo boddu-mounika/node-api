@@ -69,16 +69,16 @@ exports.handler = async (event) => {
       // Generate bulk update query
       let query = `UPDATE ${tableName} SET ${nameColumnName} = CASE `;
       let params = [];
-      console.log(tabledata.filter((row) => row.StandardAnswer !== null));
+      console.log(tabledata.filter((row) => row.StandardAnswerWeb !== null));
       const filteredTableData = tabledata.filter(
-        (row) => row.StandardAnswer !== null
+        (row) => row.StandardAnswerWeb !== null
       );
 
       filteredTableData.forEach((row) => {
-        console.log(row.StandardAnswer);
+        console.log(row.StandardAnswerWeb);
         query += `WHEN ${idColumnName} = @id${row.Id} THEN @name${row.Id} `;
         request.input(`id${row.Id}`, sql.Int, row.Id);
-        request.input(`name${row.Id}`, sql.NVarChar, row.StandardAnswer);
+        request.input(`name${row.Id}`, sql.NVarChar, row.StandardAnswerWeb);
       });
       query += `END WHERE ${idColumnName} IN (`;
       query += filteredTableData.map((row) => `@id${row.Id}`)

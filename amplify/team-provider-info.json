@@ -45,7 +45,7 @@
         },
         "submitcase": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/submitcase-7a4b30556f6c53427071-build.zip",
+          "s3Key": "amplify-builds/submitcase-2f793039393467444231-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "insertquestions": {
@@ -60,7 +60,7 @@
         },
         "email": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/email-7764726d636d42455442-build.zip"
+          "s3Key": "amplify-builds/email-7a595a2f5765554f4841-build.zip"
         },
         "getphonenumber": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
@@ -82,7 +82,7 @@
         "updatequestions": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/updatequestions-38455a36626959327931-build.zip"
+          "s3Key": "amplify-builds/updatequestions-41683438684e6e414a43-build.zip"
         }
       },
       "api": {

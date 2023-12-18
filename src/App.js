@@ -31,7 +31,8 @@ import AddNewCase  from "./AppPages/AddNewCase";
 import Home from "./AppPages/Home";
 import LandingPage from "./AppPages/LandingPage";
 import Submit from "./AppPages/SubmitForm/Submit"
-
+import styles from './App.css'
+import { ButtonBase } from "@mui/material";
 const myAPI = "api747c26ec";
 const path = "/customer";
 
@@ -66,7 +67,7 @@ function App({ signOut }) {
             <Typography variant="h6" color="inherit" component="div">
               Welcome! to Steve's Legit Hub
             </Typography>
-            <Button onClick={signOut}>Sign Out</Button>
+            <Button onClick={signOut}style={{ position: 'absolute', top: '10px', right: '10px' }}>Sign Out</Button>
           </Toolbar>
         </AppBar>
       </Box>)}
@@ -82,6 +83,7 @@ function App({ signOut }) {
     </div>
   );
 }
+
 
 export default withAuthenticator(App);
 

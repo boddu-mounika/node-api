@@ -16,6 +16,7 @@ import SendIcon from "@mui/icons-material/Send";
 import DownloadIcon from "@mui/icons-material/Download";
 import { API, Storage } from "aws-amplify";
 import { SES } from "@aws-sdk/client-ses";
+import Loading from "./ReusableComponents/Loading"
 import {
   PDFDownloadLink,
   Page,
@@ -75,6 +76,7 @@ export default function Home(props) {
     lastName: "",
     emailAddress: "",
     inpFile: "",
+    inpFileName: "",
     questions: [],
     isLoading: false,
     insertedQuestions: [],
@@ -245,45 +247,68 @@ export default function Home(props) {
   };
 
   const SendWebLink = async (CaseId) => {
-    setState({...state, isLoading:true});
-    const key = state.caseId + "-" + state.caseNumber.split(" ").join("");
+    setState({ ...state, isLoading: true });
+    console.log(state.caseId);
+    console.log(state.caseNumber);
+    const key =
+      (state.caseId !== null && state.caseId !== ""
+        ? state.caseId
+        : state.insertedId) +
+      "-" +
+      state.caseNumber.split(" ").join("");
+
     const body = `${window.location.origin}/submit/${key}`;
     console.log(body);
     const path = "/email";
     const formData = new FormData();
-    formData.append("emailAddress", "mukkaaditya@gmail.com");
+    formData.append("emailAddress", state.emailAddress);
     formData.append("subject", "Submit form");
     formData.append("message", body.toString());
     const result = await API.post(myAPI, path, {
-      headers:{
-        "content-type": 'multipart/form-data'
+      headers: {
+        "content-type": "multipart/form-data",
       },
       body: formData,
     });
     setState({
       ...state,
       showSendWebLinkDialog: true,
-      isLoading:false
+      isLoading: false,
     });
   };
 
   const refresh = async () => {
+    setState({...state,isLoading:true});
     const formData = new FormData();
+    let path = "/getQuestions";
     formData.append(
       "insertedId",
       state.insertedId === 0 ? state.caseId : state.insertedId
     );
     console.log(state.insertedId === 0 ? state.caseId : state.insertedId);
     let questions = [];
-    await axios
-      .post("http://localhost:5000/getQuestions", formData)
-      .then((resultset) => {
-        //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
+    // await axios
+    //   .post("http://localhost:5000/getQuestions", formData)
+    //   .then((resultset) => {
+    //     //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
 
-        questions = resultset.data.recordset;
-        console.log(questions);
-      });
-    setState({ ...state, questionTable: questions });
+    //     questions = resultset.data.recordset;
+    //     console.log(questions);
+    //   });
+    await API.get(
+      myAPI,
+      path + "/" + (state.insertedId === 0 ? state.caseId : state.insertedId),
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }
+    ).then(async (response) => {
+      console.log(response);
+      questions = await response.recordset;
+      console.log(questions);
+    });
+    setState({ ...state, questionTable: questions, isLoading:false });
   };
 
   const startConversation = async () => {
@@ -397,44 +422,35 @@ export default function Home(props) {
     //const myAPI = "api747c26ec";
     const path = "/getfilecontent";
     const file = event.target.files[0];
+    let resp;
+    //console.log(file);
     const filename = Date.now() + "-" + file.name.replace(/ /g, "");
+    console.log(file.name);
+    //setState({ ...state, inpFile:file });
+    await uploadFile(file, filename).then(async () => {
+      console.log(file);
 
-    uploadFile(file, filename).then(() => {
-      console.log(filename);
-      let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
-      const response = API.get(myAPI, path + "/" + filename, {
+      const response = await API.get(myAPI, path + "/" + filename, {
         headers: {
           "Content-Type": "text/plain",
         },
       }).then((response) => {
         console.log(response);
-        const myArray = response.split(myregexp);
-        setState({
-          ...state,
-          questions: myArray,
-          inpFile: file,
-          s3bucketfileName: filename,
-        });
+        resp = response;
         console.log(state);
       });
     });
 
-    // //await axios
-    // //console.log("https://pf80ka579j.execute-api.us-east-2.amazonaws.com/"+process.env);
-    // await axios.post('https://pf80ka579j.execute-api.us-east-2.amazonaws.com/staging/upload', formData)
-    //   .then((response) => {
-    //     console.log(response);
-    //     //setPdfContent(response.data);
-
-    //     let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
-
-    //     let text = response.data;
-    //     const myArray = text.split(myregexp);
-    //     setState({ ...state, questions: myArray, inpFile: file });
-    //     console.log(myArray);
-    //   });
-    //setState({...state, inpFile:file});
-    // console.log(file);
+    let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+    const myArray = resp.split(myregexp);
+    setState({
+      ...state,
+      questions: myArray,
+      inpFile: file,
+      inpFileName: file.name,
+      s3bucketfileName: filename,
+      isLoading: false,
+    });
   };
 
   const onSubmit = async () => {
@@ -459,6 +475,7 @@ export default function Home(props) {
     formData.append("PhoneNumber", state.phoneNumber);
     formData.append("EmailId", state.emailAddress);
     formData.append("CaseId", CaseNumber);
+    formData.append("s3BucketFileName", state.s3bucketfileName);
     //console.log(state.phoneNumber);
     console.log(formData);
     let insertObj = [];
@@ -515,6 +532,7 @@ export default function Home(props) {
       questionTable: insertedQuestions,
       showTable: true,
       insertedId: insertedId,
+      caseNumber: CaseNumber[0],
     });
   };
 
@@ -619,7 +637,7 @@ export default function Home(props) {
               label="Middle Name"
               variant="outlined"
               onChange={handleChange}
-              value={state.middleName}
+              value={state.middleName?state.middleName:""}
               disabled={
                 !state.createCasePage ||
                 (state.showTable && state.questionTable.length > 0)
@@ -665,7 +683,7 @@ export default function Home(props) {
               }
             />
           </Grid>
-          <Grid xs={12}>
+          <Grid item xs={12}>
             {((!state.createCasePage && state.questionTable.length > 0) ||
               (state.showTable && state.questionTable.length > 0)) && (
               // <Link to="/Case" state={{ selectedRow: selectedRow }}>
@@ -721,7 +739,7 @@ export default function Home(props) {
                 type="file"
                 onChange={handleFileChange}
                 disabled={!state.createCasePage}
-                //value={state.inpFile}
+                //placeholder={state.inpFileName || "No file chosen"}
               />
             </Grid>
           )}
@@ -730,7 +748,7 @@ export default function Home(props) {
               <Button
                 variant="contained"
                 onClick={onSubmit}
-                disabled={!state.createCasePage}
+                disabled={!state.createCasePage || !(state.firstName!=="" && state.lastName!=="" && state.phoneNumber!=="" && state.emailAddress!=="" && state.inpFile!="")}
               >
                 Submit
               </Button>
@@ -771,6 +789,7 @@ export default function Home(props) {
                         <TableCell style={{ width: "30%" }}>
                           Formatted Question{" "}
                         </TableCell>
+                        <TableCell>User response Web</TableCell>
                         <TableCell>Message Sent</TableCell>
                         <TableCell>Message Received</TableCell>
                         <TableCell>Responses</TableCell>
@@ -783,6 +802,7 @@ export default function Home(props) {
                           <TableCell>{row.SequenceNumber}</TableCell>
                           <TableCell>{row.OriginalQuestion}</TableCell>
                           <TableCell>{row.StandardQuestion}</TableCell>
+                          <TableCell>{row.StandardAnswerWeb}</TableCell>
                           <TableCell>
                             {(row.MsgSent === 1 || row.MsgSent === true) && (
                               <DoneIcon fontSize="small"></DoneIcon>
@@ -821,10 +841,6 @@ export default function Home(props) {
       </Box>
     </React.Fragment>
   ) : (
-    <Box
-      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-    >
-      <CircularProgress />
-    </Box>
+    <Loading />
   );
 }

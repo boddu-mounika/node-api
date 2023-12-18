@@ -88,8 +88,9 @@ exports.handler = async (event) => {
         request.input("EmailId", sql.NVarChar, formdata.EmailId);
         request.input("CaseId", sql.NVarChar, formdata.CaseId);
         request.input("MiddleName", sql.NVarChar, formdata.MiddleName);
+        request.input("s3BucketFileName",sql.NVarChar,formdata.s3BucketFileName)
         const insertionQuery =
-          "INSERT INTO [Cases] (FirstName,MiddleName,LastName, PhoneNumber,EmailId, CaseId) VALUES (@FirstName,@MiddleName, @LastName,@PhoneNumber,@EmailId, @CaseId) SELECT SCOPE_IDENTITY() as id";
+          "INSERT INTO [Cases] (FirstName,MiddleName,LastName, PhoneNumber,EmailId, CaseId, s3BucketFileName) VALUES (@FirstName,@MiddleName, @LastName,@PhoneNumber,@EmailId, @CaseId, @s3BucketFileName) SELECT SCOPE_IDENTITY() as id";
         //let values = JSON.parse(req.body.insertObj);
         request.query(insertionQuery, (err, result) => {
           if (err) {
