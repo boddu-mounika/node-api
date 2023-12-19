@@ -103,6 +103,7 @@ const Submit = (props) => {
     const path = "/Chatgptcall";
     tableData.forEach(async (element) => {
       console.log(element.OriginalQuestion);
+      //await new Promise((resolve) => setTimeout(resolve, index * 1000));
       const response = await API.get(
         myAPI,
         path + "/" + element.OriginalQuestion

@@ -70,7 +70,7 @@
         "Chatgptcall": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/Chatgptcall-56456a4337307637484e-build.zip",
+          "s3Key": "amplify-builds/Chatgptcall-4c3052353541686b6153-build.zip",
           "chatgptPromptAnswer": "Rephrase the below senetence into attorney language:",
           "chatgptPrompt": "Convert this question into layman language:"
         },
@@ -82,7 +82,7 @@
         "updatequestions": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/updatequestions-41683438684e6e414a43-build.zip"
+          "s3Key": "amplify-builds/updatequestions-5332573262516c4d7031-build.zip"
         }
       },
       "api": {

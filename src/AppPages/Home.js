@@ -16,7 +16,8 @@ import SendIcon from "@mui/icons-material/Send";
 import DownloadIcon from "@mui/icons-material/Download";
 import { API, Storage } from "aws-amplify";
 import { SES } from "@aws-sdk/client-ses";
-import Loading from "./ReusableComponents/Loading"
+import Loading from "./ReusableComponents/Loading";
+import { Input } from "@mui/material";
 import {
   PDFDownloadLink,
   Page,
@@ -278,7 +279,7 @@ export default function Home(props) {
   };
 
   const refresh = async () => {
-    setState({...state,isLoading:true});
+    setState({ ...state, isLoading: true });
     const formData = new FormData();
     let path = "/getQuestions";
     formData.append(
@@ -287,14 +288,14 @@ export default function Home(props) {
     );
     console.log(state.insertedId === 0 ? state.caseId : state.insertedId);
     let questions = [];
-    // await axios
     //   .post("http://localhost:5000/getQuestions", formData)
     //   .then((resultset) => {
     //     //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
 
     //     questions = resultset.data.recordset;
     //     console.log(questions);
-    //   });
+    //   });// await axios
+
     await API.get(
       myAPI,
       path + "/" + (state.insertedId === 0 ? state.caseId : state.insertedId),
@@ -308,7 +309,7 @@ export default function Home(props) {
       questions = await response.recordset;
       console.log(questions);
     });
-    setState({ ...state, questionTable: questions, isLoading:false });
+    setState({ ...state, questionTable: questions, isLoading: false });
   };
 
   const startConversation = async () => {
@@ -419,14 +420,13 @@ export default function Home(props) {
   };
 
   const handleFileChange = async (event) => {
-    //const myAPI = "api747c26ec";
     const path = "/getfilecontent";
     const file = event.target.files[0];
     let resp;
-    //console.log(file);
     const filename = Date.now() + "-" + file.name.replace(/ /g, "");
-    console.log(file.name);
-    //setState({ ...state, inpFile:file });
+
+    setState({ ...state, isLoading: true });
+
     await uploadFile(file, filename).then(async () => {
       console.log(file);
 
@@ -438,20 +438,67 @@ export default function Home(props) {
         console.log(response);
         resp = response;
         console.log(state);
+
+        updateStateAfterFileUpload(file, filename, resp);
       });
     });
+  };
 
+  const updateStateAfterFileUpload = (file, filename, resp) => {
     let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
     const myArray = resp.split(myregexp);
+
     setState({
       ...state,
+      isLoading: false,
       questions: myArray,
       inpFile: file,
       inpFileName: file.name,
       s3bucketfileName: filename,
-      isLoading: false,
     });
   };
+
+  const handleFileChange1 = async (event) => {
+    //const myAPI = "api747c26ec";
+    const path = "/getfilecontent";
+    const file = event.target.files[0];
+    let resp;
+    //console.log(file);
+    const filename = Date.now() + "-" + file.name.replace(/ /g, "");
+    console.log(file.name);
+    //setState({ ...state, isLoading: true });
+    setState({
+      ...state,
+      //questions: myArray,
+      inpFile: file,
+      inpFileName: file.name,
+      s3bucketfileName: filename,
+      //isLoading: false,
+    });
+    // await uploadFile(file, filename).then(async () => {
+    //   console.log(file);
+
+    //   const response = await API.get(myAPI, path + "/" + filename, {
+    //     headers: {
+    //       "Content-Type": "text/plain",
+    //     },
+    //   }).then((response) => {
+    //     console.log(response);
+    //     resp = response;
+    //     console.log(state);
+    //   });
+    //   //});
+
+    //   let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+    //   const myArray = resp.split(myregexp);
+      
+    // });
+  };
+
+  // const onSubmit = async () => {
+  //   const path4 = "/Chatgptcall"
+  //   API.get(myAPI,path4+"/"+34);
+  // }
 
   const onSubmit = async () => {
     setState({ ...state, isLoading: true });
@@ -459,6 +506,7 @@ export default function Home(props) {
     const path = "/submitcase";
     const path2 = "/insertquestions";
     const path3 = "/getQuestions";
+    const path4 = "/Chatgptcall";
     const formData = new FormData();
     let insertedQuestions = [];
     let insertedId = 0;
@@ -521,6 +569,7 @@ export default function Home(props) {
           //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
           console.log(resultset);
           insertedQuestions = resultset.recordset;
+          API.get(myAPI, path4 + "/" + insertedId);
         });
       });
     });
@@ -637,7 +686,7 @@ export default function Home(props) {
               label="Middle Name"
               variant="outlined"
               onChange={handleChange}
-              value={state.middleName?state.middleName:""}
+              value={state.middleName ? state.middleName : ""}
               disabled={
                 !state.createCasePage ||
                 (state.showTable && state.questionTable.length > 0)
@@ -732,7 +781,7 @@ export default function Home(props) {
           </Grid>
           {state.createCasePage && !state.showTable && (
             <Grid item xs={12} style={{ marginLeft: "10px" }}>
-              <input
+              <Input
                 style={{ margin: "10px" }}
                 id="inpFile"
                 variant="filled"
@@ -741,6 +790,26 @@ export default function Home(props) {
                 disabled={!state.createCasePage}
                 //placeholder={state.inpFileName || "No file chosen"}
               />
+
+              <input
+                accept="pdf/*"
+                //className={classes.input}
+                style={{ display: "none" }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={handleFileChange1}
+                disabled={!state.createCasePage}
+              />
+              <label htmlFor="raised-button-file">
+                <Button
+                  variant="contained"
+                  component="span"
+                  //className={classes.button}
+                >
+                  Upload
+                </Button>
+              </label>
             </Grid>
           )}
           {state.createCasePage && !state.showTable && (
@@ -748,7 +817,16 @@ export default function Home(props) {
               <Button
                 variant="contained"
                 onClick={onSubmit}
-                disabled={!state.createCasePage || !(state.firstName!=="" && state.lastName!=="" && state.phoneNumber!=="" && state.emailAddress!=="" && state.inpFile!="")}
+                disabled={
+                  !state.createCasePage ||
+                  !(
+                    state.firstName !== "" &&
+                    state.lastName !== "" &&
+                    state.phoneNumber !== "" &&
+                    state.emailAddress !== "" &&
+                    state.inpFile != ""
+                  )
+                }
               >
                 Submit
               </Button>

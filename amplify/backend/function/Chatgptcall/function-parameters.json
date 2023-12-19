@@ -1,7 +1,9 @@
 {
   "lambdaLayers": [],
   "secretNames": [
-    "key"
+    "key",
+    "DB_USERNAME",
+    "DB_PASS"
   ],
   "environmentVariableList": [
     {

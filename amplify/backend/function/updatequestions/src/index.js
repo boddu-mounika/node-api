@@ -51,13 +51,8 @@ exports.handler = async (event) => {
     };
 
     sql.connect(config).then((pool) => {
-      const request = new sql.Request();
-
-      // Configure data to be inserted/updated
-      const data = [
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-      ];
+      const request = new sql.Request();      
+      
 
       // Define the table and column names
       const tableName = "questions";

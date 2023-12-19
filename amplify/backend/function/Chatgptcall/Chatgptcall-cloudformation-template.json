@@ -101,6 +101,50 @@
                 ]
               ]
             },
+            "DB_USERNAME": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Sub": [
+                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                      {
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
+                        "env": {
+                          "Ref": "env"
+                        },
+                        "functionName": "Chatgptcall"
+                      }
+                    ]
+                  },
+                  "DB_USERNAME"
+                ]
+              ]
+            },
+            "DB_PASS": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Sub": [
+                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                      {
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
+                        "env": {
+                          "Ref": "env"
+                        },
+                        "functionName": "Chatgptcall"
+                      }
+                    ]
+                  },
+                  "DB_PASS"
+                ]
+              ]
+            },
             "CHATGPT_PROMPT_ANSWER": {
               "Ref": "chatgptPromptAnswer"
             },
