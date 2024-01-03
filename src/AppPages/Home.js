@@ -3,21 +3,27 @@ import { useState, useEffect } from "react";
 import axios, { Axios } from "axios";
 import { useLocation } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
-import { Link } from "react-router-dom";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import AttestDialog from "./ReusableComponents/AttestDialog";
+import * as myConstClass from "../Util/Constants";
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
+import WarningIcon from "@mui/icons-material/Warning";
+import Breadcrumb from "./ReusableComponents/Breadcrumb";
 import Slide from "@mui/material/Slide";
+import WebllinkDialog from "./ReusableComponents/Weblinkdialog";
+import ViewResponseDialog from "./ReusableComponents/ViewResponseDialog";
+import Paper from "@mui/material/Paper";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import HomeIcon from "@mui/icons-material/Home";
+import QuestionsTable from "./ReusableComponents/QuestionsTable";
 import SendIcon from "@mui/icons-material/Send";
 import DownloadIcon from "@mui/icons-material/Download";
 import { API, Storage } from "aws-amplify";
 import { SES } from "@aws-sdk/client-ses";
 import Loading from "./ReusableComponents/Loading";
-import { Input } from "@mui/material";
+import StatusStepper from "./ReusableComponents/StatusStepper";
+import Typography from "@mui/material/Typography";
+import { Auth } from "aws-amplify";
+import CancelDialog from "./ReusableComponents/CancelDialog";
+import CompleteDialog from "./ReusableComponents/CompleteDialog";
 import {
   PDFDownloadLink,
   Page,
@@ -43,7 +49,8 @@ import {
   Box,
   Icon,
 } from "@mui/material";
-import { StadiumTwoTone } from "@mui/icons-material";
+import { StadiumTwoTone, Troubleshoot } from "@mui/icons-material";
+import { ClassNames } from "@emotion/react";
 
 //import FileUploadComponent from "./UploadFileComponent";
 //import { red } from "@mui/material/colors";
@@ -67,8 +74,8 @@ const styles = StyleSheet.create({
 
 export default function Home(props) {
   const location = useLocation();
+  const selectedRow = location.state !== null ? location.state : null;
 
-  const { selectedRow } = location.state;
   let initialState = {
     question: "",
     phoneNumber: "",
@@ -80,6 +87,8 @@ export default function Home(props) {
     inpFileName: "",
     questions: [],
     isLoading: false,
+    cancelQueue: "",
+    emailSent: false,
     insertedQuestions: [],
     showTable: false,
     insertedId: 0,
@@ -88,22 +97,34 @@ export default function Home(props) {
     chatInitiatedForCase: false,
     caseId: "",
     caseNumber: "",
+    status: "",
     showResponsesDialog: false,
     showSendWebLinkDialog: false,
     standardAnswer: "",
     originalAnswer: "",
     s3bucketfileName: "",
+    isNewLoading: false,
+    value: 0,
+    loadingtext: "",
+    showAttestDialog: false,
+    emailChannelInitiated: false,
+    showCancelDialog: false,
+    cancelConfirmation: false,
+    showCompleteDialog: false,
+    completeConfirmation: false,
   };
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
     console.log("CALLED>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    const { selectedRow } = location.state;
+
     if (
       location.state !== undefined &&
-      location.state != null &&
+      location.state !== null &&
+      location.state.selectedRow !== null &&
       selectedRow !== null
     ) {
+      const { selectedRow } = location.state;
       setState({ ...state, isLoading: true });
       let path = "/getQuestions";
       let tableData = [];
@@ -122,6 +143,13 @@ export default function Home(props) {
           tableData = await response.recordset;
           console.log(tableData);
         });
+        // let status = selectedRow.Status;
+        // let cancelQueue = "";
+        // if(status.toString().includes(",")){
+        //   status=myConstClass.STATUS_CANCEL;
+        //   cancelQueue=status
+        // }
+
         setState({
           ...state,
           questionTable: tableData,
@@ -131,123 +159,47 @@ export default function Home(props) {
           phoneNumber: selectedRow.PhoneNumber,
           emailAddress: selectedRow.EmailId,
           chatInitiatedForCase: selectedRow.ChatInitiated,
+          s3bucketfileName: selectedRow.s3BucketFileName,
           createCasePage: false,
           caseId: selectedRow.Id,
           caseNumber: selectedRow.CaseId,
           isLoading: false,
+          status: selectedRow.Status,
+          cancelQueue: selectedRow.CancelQueue,
+          emailChannelInitiated:
+            selectedRow.EmailInitiated === null ? false : true,
         });
       }
       getData();
     }
   }, []);
 
-  const MyDoc = () => {
+  const viewResponse = async (row) => {
+    // setState({ ...state, isLoading: true });
+    // const path = "/getResponses";
     // const formData = new FormData();
-    // formData.append("caseId", state.insertedId === 0 ? state.caseId : state.insertedId);
+    // formData.append("questionId", questionId);
     // let responses = [];
-    // axios
-    //   .post("http://localhost:5000/getDownloadContent", formData)
-    //   .then((resultset) => {
-    //     responses = resultset.data.recordset;
-    //     console.log(responses);
-    //   });
-    let pdfText = "Hey";
-    return (
-      <Document>
-        <Page size="A4" style={styles.page}>
-          <View style={styles.section}>
-            <Text>Case Number : {state.questionTable[0].CaseId}</Text>
 
-            {state.questionTable.map((row) => (
-              <div>
-                <View style={styles.section}>
-                  <Text>Question-{row.SequenceNumber}</Text>
-                </View>
-                <View style={styles.section}>
-                  <Text>
-                    Attorney Question :{"\n" + row.OriginalQuestion + "\n"}
-                  </Text>
-                </View>
-                <View style={styles.section}>
-                  <Text>
-                    Layman Question : {"\n" + row.StandardQuestion + "\n"}
-                  </Text>
-                </View>
-                <View style={styles.section}>
-                  <Text>
-                    Attorney Answer : {"\n" + row.OriginalAnswer + "\n"}
-                  </Text>
-                </View>
-                <View style={styles.section}>
-                  <Text>
-                    Layman Answer : {"\n" + row.StandardAnswer + "\n"}
-                  </Text>
-                </View>
-              </div>
-            ))}
-          </View>
-        </Page>
-      </Document>
-    );
-  };
-
-  // const generatePdf = async () => {
-  //   const docDefinition = {
-  //     content: ["This is a PDF created using pdfMake "],
-  //   };
-  //   pdfMake.createPdf(docDefinition).download("myPdf.pdf");
-  // };
-
-  const chatGptCall = async (prompt) => {
-    let resp = "";
-    console.log(prompt);
-    await axios
-      .post(
-        `https://api.openai.com/v1/completions`,
-        {
-          model: "text-davinci-003",
-          prompt: prompt,
-          temperature: 0.7,
-          max_tokens: 256,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization:
-              "Bearer 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",
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res);
-        resp = res;
-      });
-    console.log(resp);
-    return resp.data.choices[0].text;
-  };
-
-  const viewResponse = async (questionId) => {
-    const formData = new FormData();
-    formData.append("questionId", questionId);
-    let responses = [];
-    await axios
-      .post("http://localhost:5000/getResponses", formData)
-      .then((resultset) => {
-        responses = resultset.data.recordset;
-        console.log(responses);
-      });
+    // await API.get(myAPI, path + "/" + questionId, {
+    //   headers: {
+    //     "Content-Type": "text/plain",
+    //   },
+    // }).then((resultset) => {
+    //   console.log(resultset.recordset);
+    //   responses = resultset.recordset;
+    //   console.log(responses);
+    // });
     setState({
       ...state,
+      isLoading: false,
       showResponsesDialog: true,
-      standardAnswer: responses[0].StandardAnswer,
-      originalAnswer: responses[0].OriginalAnswer,
+      standardAnswer: row.StandardAnswer,
+      originalAnswer: row.OriginalAnswer,
     });
   };
 
-  const SendWebLink = async (CaseId) => {
+  const SendWebLink = async () => {
     setState({ ...state, isLoading: true });
     console.log(state.caseId);
     console.log(state.caseNumber);
@@ -257,24 +209,39 @@ export default function Home(props) {
         : state.insertedId) +
       "-" +
       state.caseNumber.split(" ").join("");
-
-    const body = `${window.location.origin}/submit/${key}`;
+    console.log(process.env.FORM_LINK);
+    const body = `$https://main.d1rrqzqg8fxd0a.amplifyapp.com/submit/${key}`;
     console.log(body);
     const path = "/email";
     const formData = new FormData();
     formData.append("emailAddress", state.emailAddress);
     formData.append("subject", "Submit form");
     formData.append("message", body.toString());
+
     const result = await API.post(myAPI, path, {
       headers: {
         "content-type": "multipart/form-data",
       },
       body: formData,
+    }).then(async () => {
+      if (!state.emailChannelInitiated) {
+        const path = "/caseStatusUpdate";
+        await API.get(
+          myAPI,
+          path + "/" + state.caseId + "-" + myConstClass.STATUS_AWAITING
+        ).then(async (response) => {
+          console.log(response);
+          const result = await response;
+        });
+      }
     });
     setState({
       ...state,
-      showSendWebLinkDialog: true,
+      emailSent: true,
+      //showSendWebLinkDialog: true,
       isLoading: false,
+      status: myConstClass.STATUS_AWAITING,
+      emailChannelInitiated: true,
     });
   };
 
@@ -288,13 +255,6 @@ export default function Home(props) {
     );
     console.log(state.insertedId === 0 ? state.caseId : state.insertedId);
     let questions = [];
-    //   .post("http://localhost:5000/getQuestions", formData)
-    //   .then((resultset) => {
-    //     //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
-
-    //     questions = resultset.data.recordset;
-    //     console.log(questions);
-    //   });// await axios
 
     await API.get(
       myAPI,
@@ -312,51 +272,51 @@ export default function Home(props) {
     setState({ ...state, questionTable: questions, isLoading: false });
   };
 
-  const startConversation = async () => {
-    setState({ ...state, isLoading: true });
+  // const startConversation = async () => {
+  //   setState({ ...state, isLoading: true });
 
-    //Get first question
-    let tableData = [];
-    let UpdatedTable1 = null;
-    console.log(state.insertedId);
-    console.log(state.caseId);
-    const formData = new FormData();
-    formData.append(
-      "insertedId",
-      state.insertedId === 0 ? state.caseId : state.insertedId
-    );
-    await axios
-      .post("http://localhost:5000/getFirstQuestion", formData)
-      .then(async (response) => {
-        console.log(response);
-        let prompt =
-          "Give me below interogatory question in layman language so that my client can easily answer ";
-        console.log(prompt + ":" + response.data.recordset[0].OriginalQuestion);
-        const chatgptreply = await chatGptCall(
-          prompt + response.data.recordset[0].OriginalQuestion
-        );
-        console.log(chatgptreply);
-        UpdatedTable1 = await sendSms(
-          chatgptreply,
-          response.data.recordset[0].Id,
-          response.data.recordset[0].SequenceNumber
-        );
-        //routeChange();
-        const formData = new FormData();
-        formData.append(
-          "insertedId",
-          state.insertedId === 0 ? state.caseId : state.insertedId
-        );
-      });
-    //setState({...state, questionTable: [], showTable:true});
-    setState({
-      ...state,
-      chatInitiatedForCase: true,
-      questionTable: UpdatedTable1,
-      showTable: true,
-      isLoading: false,
-    });
-  };
+  //   //Get first question
+  //   let tableData = [];
+  //   let UpdatedTable1 = null;
+  //   console.log(state.insertedId);
+  //   console.log(state.caseId);
+  //   const formData = new FormData();
+  //   formData.append(
+  //     "insertedId",
+  //     state.insertedId === 0 ? state.caseId : state.insertedId
+  //   );
+  //   await axios
+  //     .post("http://localhost:5000/getFirstQuestion", formData)
+  //     .then(async (response) => {
+  //       console.log(response);
+  //       let prompt =
+  //         "Give me below interogatory question in layman language so that my client can easily answer ";
+  //       console.log(prompt + ":" + response.data.recordset[0].OriginalQuestion);
+  //       const chatgptreply = await chatGptCall(
+  //         prompt + response.data.recordset[0].OriginalQuestion
+  //       );
+  //       console.log(chatgptreply);
+  //       UpdatedTable1 = await sendSms(
+  //         chatgptreply,
+  //         response.data.recordset[0].Id,
+  //         response.data.recordset[0].SequenceNumber
+  //       );
+  //       //routeChange();
+  //       const formData = new FormData();
+  //       formData.append(
+  //         "insertedId",
+  //         state.insertedId === 0 ? state.caseId : state.insertedId
+  //       );
+  //     });
+  //   //setState({...state, questionTable: [], showTable:true});
+  //   setState({
+  //     ...state,
+  //     chatInitiatedForCase: true,
+  //     questionTable: UpdatedTable1,
+  //     showTable: true,
+  //     isLoading: false,
+  //   });
+  // };
 
   const sendSms = async (question, Id, SNo) => {
     let Updatedtable = null;
@@ -384,11 +344,6 @@ export default function Home(props) {
     return Updatedtable;
   };
 
-  // const routeChange = () =>{
-  //   let path = `newPath`;
-  //   navigate(path);
-  // }
-
   const handleChange = (e) => {
     let newState = { ...state };
     newState[e.target.name] = e.target.value;
@@ -406,13 +361,20 @@ export default function Home(props) {
     }
   };
 
+  const deleteFile = async (file, filename) => {
+    try {
+      await Storage.remove(filename, file);
+
+      console.log("File removed successfully");
+    } catch (error) {
+      console.error("Error removing file:", error);
+    }
+  };
+
   const handleDownload = async (filename) => {
     try {
-      filename = "1701211477646-Def Interrog to Plf.pdf";
-      //Storage.get
-      const response = await Storage.get(filename);
+      const response = await Storage.get(state.s3bucketfileName);
       console.log(response);
-      //const fileUrl = URL.createObjectURL(response);
       window.open(response); // Open the file URL in a new tab for download
     } catch (error) {
       console.error("Error downloading file", error);
@@ -420,11 +382,15 @@ export default function Home(props) {
   };
 
   const handleFileChange = async (event) => {
+    if (state.inpFile !== "") {
+      deleteFile(state.inpFile, state.s3bucketfileName);
+    }
+
     const path = "/getfilecontent";
     const file = event.target.files[0];
     let resp;
     const filename = Date.now() + "-" + file.name.replace(/ /g, "");
-
+    console.log(file.name);
     setState({ ...state, isLoading: true });
 
     await uploadFile(file, filename).then(async () => {
@@ -438,70 +404,35 @@ export default function Home(props) {
         console.log(response);
         resp = response;
         console.log(state);
+      });
 
-        updateStateAfterFileUpload(file, filename, resp);
+      let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
+      const myArray = resp.split(myregexp);
+      setState({
+        ...state,
+        questions: myArray,
+        inpFile: file,
+        inpFileName: file.name,
+        s3bucketfileName: filename,
+        isLoading: false,
       });
     });
   };
 
-  const updateStateAfterFileUpload = (file, filename, resp) => {
-    let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
-    const myArray = resp.split(myregexp);
-
-    setState({
-      ...state,
-      isLoading: false,
-      questions: myArray,
-      inpFile: file,
-      inpFileName: file.name,
-      s3bucketfileName: filename,
-    });
-  };
-
-  const handleFileChange1 = async (event) => {
-    //const myAPI = "api747c26ec";
-    const path = "/getfilecontent";
-    const file = event.target.files[0];
-    let resp;
-    //console.log(file);
-    const filename = Date.now() + "-" + file.name.replace(/ /g, "");
-    console.log(file.name);
-    //setState({ ...state, isLoading: true });
-    setState({
-      ...state,
-      //questions: myArray,
-      inpFile: file,
-      inpFileName: file.name,
-      s3bucketfileName: filename,
-      //isLoading: false,
-    });
-    // await uploadFile(file, filename).then(async () => {
-    //   console.log(file);
-
-    //   const response = await API.get(myAPI, path + "/" + filename, {
-    //     headers: {
-    //       "Content-Type": "text/plain",
-    //     },
-    //   }).then((response) => {
-    //     console.log(response);
-    //     resp = response;
-    //     console.log(state);
-    //   });
-    //   //});
-
-    //   let myregexp = new RegExp("\\s+[0-9]+\\.+\\s");
-    //   const myArray = resp.split(myregexp);
-      
-    // });
-  };
+  const handleAttest = () => {};
 
   // const onSubmit = async () => {
-  //   const path4 = "/Chatgptcall"
-  //   API.get(myAPI,path4+"/"+34);
+
+  //   console.log(user);
   // }
 
   const onSubmit = async () => {
-    setState({ ...state, isLoading: true });
+    setState({
+      ...state,
+      value: 10,
+      loadingtext: "Creating case...",
+      isLoading: true,
+    });
     console.log(state.questions);
     const path = "/submitcase";
     const path2 = "/insertquestions";
@@ -510,6 +441,9 @@ export default function Home(props) {
     const formData = new FormData();
     let insertedQuestions = [];
     let insertedId = 0;
+    const user = await Auth.currentAuthenticatedUser();
+    const loggedinuser = user.username;
+    const loggedInuseremail = user.attributes.email;
 
     let CaseNumber = state.questions[0].match(
       "CASE NO+\\.\\s+[0-9]+\\-[A-Z]+\\-+[0-9]+"
@@ -524,12 +458,11 @@ export default function Home(props) {
     formData.append("EmailId", state.emailAddress);
     formData.append("CaseId", CaseNumber);
     formData.append("s3BucketFileName", state.s3bucketfileName);
-    //console.log(state.phoneNumber);
+    formData.append("Status", myConstClass.STATUS_NEW);
+    formData.append("loggedInuseremail", loggedInuseremail);
+    formData.append("loggedinuser", loggedinuser);
     console.log(formData);
     let insertObj = [];
-    //CaseId
-    // await axios
-    //   .post("http://localhost:5000/test", formData)
     const result = await API.post(myAPI, path, {
       body: formData,
     }).then(async (response) => {
@@ -555,18 +488,16 @@ export default function Home(props) {
       formData.append("insertObj", JSON.stringify(insertObj));
 
       console.log(response);
-      //await axios
+      //setState({ ...state, value: 30, loadingtext: "Inserting questions..." });
       await API.post(myAPI, path2, { body: formData }).then(async () => {
         console.log("Succesfully.");
         formData.append("insertedId", insertedId.toString());
-        //await axios
 
         await API.get(myAPI, path3 + "/" + insertedId, {
           headers: {
             "Content-Type": "text/plain",
           },
         }).then((resultset) => {
-          //setState({...state,isLoading:false,insertedQuestions:resultset.data.recordset,showTable:true,insertedId:insertedId});
           console.log(resultset);
           insertedQuestions = resultset.recordset;
           API.get(myAPI, path4 + "/" + insertedId);
@@ -581,343 +512,473 @@ export default function Home(props) {
       questionTable: insertedQuestions,
       showTable: true,
       insertedId: insertedId,
+      caseId: insertedId,
       caseNumber: CaseNumber[0],
+      status: myConstClass.STATUS_NEW,
     });
   };
 
-  const handleClose = () => {
+  const handleAttestation = async () => {
+    setState({ ...state, isLoading: true });
+    const path = "/caseStatusUpdate";
+    await API.get(
+      myAPI,
+      path + "/" + state.caseId + "-" + myConstClass.STATUS_ATTESTED
+    ).then(async (response) => {
+      console.log(response);
+      const result = await response;
+    });
     setState({
       ...state,
-      showResponsesDialog: false,
+      showAttestDialog: false,
+      isLoading: false,
+      status: myConstClass.STATUS_ATTESTED,
+    });
+  };
+
+  const handleComplete = async () => {
+    setState({ ...state, isLoading: true });
+    const path = "/caseStatusUpdate";
+    await API.get(
+      myAPI,
+      path + "/" + state.caseId + "-" + myConstClass.STAUS_COMPLETE
+    ).then(async (response) => {
+      console.log(response);
+      const result = await response;
+    });
+    setState({
+      ...state,
+      completeConfirmation: false,
+      isLoading: false,
+      status: myConstClass.STAUS_COMPLETE,
+    });
+  };
+
+  const handleCancel = async () => {
+    setState({ ...state, isLoading: true });
+    let cancelQueue = "";
+    switch (state.status) {
+      case myConstClass.STATUS_NEW:
+        cancelQueue =
+          myConstClass.STATUS_NEW + "," + myConstClass.STATUS_CANCEL;
+        break;
+      case myConstClass.STATUS_ATTESTED:
+        cancelQueue =
+          myConstClass.STATUS_NEW +
+          "," +
+          myConstClass.STATUS_ATTESTED +
+          "," +
+          myConstClass.STATUS_CANCEL;
+      case myConstClass.STATUS_AWAITING:
+        cancelQueue =
+          myConstClass.STATUS_NEW +
+          "," +
+          myConstClass.STATUS_ATTESTED +
+          "," +
+          myConstClass.STATUS_AWAITING +
+          "," +
+          myConstClass.STATUS_CANCEL;
+    }
+    const path = "/caseStatusUpdate";
+    await API.get(myAPI, path + "/" + state.caseId + "-" + cancelQueue).then(
+      async (response) => {
+        console.log(response);
+        const result = await response;
+      }
+    );
+    setState({
+      ...state,
+      cancelConfirmation: false,
+      isLoading: false,
+      status: myConstClass.STATUS_CANCEL,
+      cancelQueue: cancelQueue,
+    });
+  };
+
+  const showAttestDialog = () => {
+    setState({
+      ...state,
+      showAttestDialog: true,
+    });
+  };
+
+  const handleDialogClose = () => {
+    setState({
+      ...state,
+      showAttestDialog: false,
       showSendWebLinkDialog: false,
+      emailSent: false,
+      showResponsesDialog: false,
+      showCancelDialog: false,
+      cancelConfirmation: false,
+      showCompleteDialog: false,
+      completeConfirmation: false,
+    });
+  };
+
+  const cancelDialog = () => {
+    setState({
+      ...state,
+      showCancelDialog: true,
+      cancelConfirmation: true,
+    });
+  };
+
+  const completeDialog = () => {
+    setState({
+      ...state,
+      showCompleteDialog: true,
+      completeConfirmation: true,
+    });
+  };
+
+  const OpenWebLinkDialog = () => {
+    setState({
+      ...state,
+      showSendWebLinkDialog: true,
     });
   };
 
   return !state.isLoading ? (
-    <React.Fragment>
-      <Dialog
+    <Box style={{ marginTop: "4%" }} sx={{ flexGrow: 1, p: 3 }}>
+      <ViewResponseDialog
         open={state.showResponsesDialog}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{"Responses"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            <h4>Client Answer:</h4>
-            {state.standardAnswer}
-          </DialogContentText>
-          <DialogContentText id="alert-dialog-slide-description">
-            <h4>Converted Answer:</h4>
-            {state.originalAnswer}
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+        Transition={Transition}
+        handleDialogClose={handleDialogClose}
+        standardAnswer={state.standardAnswer}
+        originalAnswer={state.originalAnswer}
+      />
 
-      <Dialog
+      <WebllinkDialog
         open={state.showSendWebLinkDialog}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{"Select communication channel"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            <h4>An email hase been sent to user. </h4>
-            {state.emailAddress}
-          </DialogContentText>
-          {/* <DialogContentText id="alert-dialog-slide-description">
-            <h4>Email:</h4>
-            {state.emailAddress}
-            <div style={{ marginTop: "30px", float: "right" }}>
-              <Button
-                variant="contained"
-                onClick={handleClose}
-                endIcon={<SendIcon />}
-              >
-                Send
-              </Button>
-            </div>
-          </DialogContentText> */}
-        </DialogContent>
-      </Dialog>
+        Transition={Transition}
+        handleClose={handleDialogClose}
+        emailAddress={state.emailAddress}
+        SendWebLink={SendWebLink}
+        emailSent={state.emailSent}
+      />
+      <AttestDialog
+        open={state.showAttestDialog}
+        handleClose={handleDialogClose}
+        handleAttestation={handleAttestation}
+      />
+      <CancelDialog
+        open={state.showCancelDialog}
+        cancelConfirmation={state.cancelConfirmation}
+        handleClose={handleDialogClose}
+        handleCancel={handleCancel}
+      />
+      <CompleteDialog
+        open={state.showCompleteDialog}
+        completeConfirmation={state.completeConfirmation}
+        handleClose={handleDialogClose}
+        handleComplete={handleComplete}
+      />
 
-      <Box
-        //component="form"
-        sx={{
-          flexGrow: 1,
-          "& .MuiTextField-root": {
-            m: 1,
-            width: "40ch",
-            verticalAlign: "center",
-          },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        {/* <Grid>
-          <Link to="/">
-            <IconButton
-              style={{ margin: "10px" }}
-              variant="contained"
-              //onClick={goToHome}
-            >
-              <HomeIcon />
-            </IconButton>
-          </Link>
-        </Grid> */}
-        <Grid container spacing={2}>
-          <Grid item xs={12} style={{ margin: "10px" }}>
-            <TextField
-              id="firstName"
-              name="firstName"
-              label="First Name"
-              variant="outlined"
-              onChange={handleChange}
-              value={state.firstName}
-              disabled={
-                !state.createCasePage ||
-                (state.showTable && state.questionTable.length > 0)
-              }
-            />
-            <TextField
-              id="middleName"
-              name="middleName"
-              label="Middle Name"
-              variant="outlined"
-              onChange={handleChange}
-              value={state.middleName ? state.middleName : ""}
-              disabled={
-                !state.createCasePage ||
-                (state.showTable && state.questionTable.length > 0)
-              }
-            />
-            <TextField
-              id="lastName"
-              name="lastName"
-              label="Last Name"
-              variant="outlined"
-              onChange={handleChange}
-              value={state.lastName}
-              disabled={
-                !state.createCasePage ||
-                (state.showTable && state.questionTable.length > 0)
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} style={{ marginLeft: "10px" }}>
-            <TextField
-              id="phoneNumber"
-              name="phoneNumber"
-              label="Phone Number"
-              variant="outlined"
-              onChange={handleChange}
-              value={state.phoneNumber}
-              disabled={
-                !state.createCasePage ||
-                (state.showTable && state.questionTable.length > 0)
-              }
-            />
-            <TextField
-              id="emailAddress"
-              name="emailAddress"
-              label="Email Address"
-              variant="outlined"
-              onChange={handleChange}
-              value={state.emailAddress}
-              disabled={
-                !state.createCasePage ||
-                (state.showTable && state.questionTable.length > 0)
-              }
-            />
-          </Grid>
-          <Grid item xs={12}>
-            {((!state.createCasePage && state.questionTable.length > 0) ||
-              (state.showTable && state.questionTable.length > 0)) && (
-              // <Link to="/Case" state={{ selectedRow: selectedRow }}>
-              <Button
-                style={{ marginLeft: "35px", marginTop: "5px" }}
-                variant="outlined"
-                onClick={startConversation}
-                disabled={state.chatInitiatedForCase}
-              >
-                Initiate Chat
-              </Button>
-            )}
-            {state.questionTable.length > 0 && (
-              <Button
-                style={{ marginLeft: "35px", marginTop: "5px" }}
-                variant="outlined"
-                onClick={() => SendWebLink(state.CaseId)}
-              >
-                Send WebLink
-              </Button>
-            )}
-            {state.questionTable.length > 0 && (
-              <Button
-                style={{ marginLeft: "35px", marginTop: "5px" }}
-                variant="outlined"
-                onClick={handleDownload}
-                startIcon={<DownloadIcon />}
-              >
-                Download as pdf
-              </Button>
-              // <PDFDownloadLink document={<MyDoc />} fileName="CaseDetails.pdf">
-              //   {({ blob, url, loading, error }) =>
-              //     loading ? "Loading document..." : "Download now!"
-              //   }
-
-              //   <Button
-              //     style={{ marginLeft: "35px", marginTop: "5px" }}
-              //     variant="outlined"
-              //     //onClick={MyDoc}
-              //     startIcon={<DownloadIcon />}
-              //   >
-              //     download as pdf
-              //   </Button>
-              // </PDFDownloadLink>
-            )}
-          </Grid>
-          {state.createCasePage && !state.showTable && (
-            <Grid item xs={12} style={{ marginLeft: "10px" }}>
-              <Input
-                style={{ margin: "10px" }}
-                id="inpFile"
-                variant="filled"
-                type="file"
-                onChange={handleFileChange}
-                disabled={!state.createCasePage}
-                //placeholder={state.inpFileName || "No file chosen"}
-              />
-
-              <input
-                accept="pdf/*"
-                //className={classes.input}
-                style={{ display: "none" }}
-                id="raised-button-file"
-                multiple
-                type="file"
-                onChange={handleFileChange1}
-                disabled={!state.createCasePage}
-              />
-              <label htmlFor="raised-button-file">
-                <Button
-                  variant="contained"
-                  component="span"
-                  //className={classes.button}
-                >
-                  Upload
-                </Button>
-              </label>
+      <React.Fragment>
+        {((!state.createCasePage && state.questionTable.length > 0) ||
+          state.showTable) && (
+          <Grid container rowSpacing={3}>
+            <Grid item xs={12}>
+              <Breadcrumb caseNumber={state.caseNumber} />
             </Grid>
-          )}
-          {state.createCasePage && !state.showTable && (
-            <Grid item xs={12} style={{ marginLeft: "15px" }}>
-              <Button
-                variant="contained"
-                onClick={onSubmit}
+            <Grid item xs={12}>
+              <StatusStepper
+                status={state.status}
+                cancelQueue={state.cancelQueue}
+              />
+            </Grid>
+          </Grid>
+        )}
+
+        <Typography variant="h6" gutterBottom style={{ marginTop: "10px" }}>
+          Client Details
+        </Typography>
+        <Paper style={{ marginTop: "30px", textAlign: "center" }}>
+          <Grid container rowSpacing={3}>
+            <Grid item xs={4}>
+              <TextField
+                id="firstName"
+                name="firstName"
+                label="First Name"
+                variant="outlined"
+                onChange={handleChange}
+                value={state.firstName}
                 disabled={
                   !state.createCasePage ||
-                  !(
-                    state.firstName !== "" &&
-                    state.lastName !== "" &&
-                    state.phoneNumber !== "" &&
-                    state.emailAddress !== "" &&
-                    state.inpFile != ""
-                  )
+                  (state.showTable && state.questionTable.length > 0)
                 }
-              >
-                Submit
-              </Button>
+                style={{ width: "90%" }}
+              />
             </Grid>
-          )}
+            <Grid item xs={4}>
+              <TextField
+                id="middleName"
+                name="middleName"
+                label="Middle Name"
+                variant="outlined"
+                onChange={handleChange}
+                value={state.middleName ? state.middleName : ""}
+                disabled={
+                  !state.createCasePage ||
+                  (state.showTable && state.questionTable.length > 0)
+                }
+                style={{ width: "90%" }}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                id="lastName"
+                name="lastName"
+                label="Last Name"
+                variant="outlined"
+                onChange={handleChange}
+                value={state.lastName}
+                disabled={
+                  !state.createCasePage ||
+                  (state.showTable && state.questionTable.length > 0)
+                }
+                style={{ width: "90%" }}
+              />
+            </Grid>
 
-          {((!state.createCasePage && state.questionTable.length > 0) ||
-            state.showTable) && (
-            <React.Fragment>
+            <Grid item xs={4}>
+              <TextField
+                id="phoneNumber"
+                name="phoneNumber"
+                label="Phone Number"
+                variant="outlined"
+                onChange={handleChange}
+                value={state.phoneNumber}
+                disabled={
+                  !state.createCasePage ||
+                  (state.showTable && state.questionTable.length > 0)
+                }
+                style={{ width: "90%" }}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                id="emailAddress"
+                name="emailAddress"
+                label="Email Address"
+                variant="outlined"
+                onChange={handleChange}
+                value={state.emailAddress}
+                disabled={
+                  !state.createCasePage ||
+                  (state.showTable && state.questionTable.length > 0)
+                }
+                style={{ width: "90%" }}
+              />
+            </Grid>
+            {((!state.createCasePage && state.questionTable.length > 0) ||
+              state.showTable) && (
+              <React.Fragment>
+                <Grid
+                  item
+                  xs={12}
+                  style={{
+                    marginBottom: "20px",
+                    textAlign: "left",
+                    marginLeft: "20px",
+                  }}
+                >
+                  {state.questionTable.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      onClick={showAttestDialog}
+                      disabled={
+                        state.questionTable.filter(
+                          (x) => x.StandardQuestion === null
+                        ).length > 0 || state.status !== myConstClass.STATUS_NEW
+                      }
+                      startIcon={
+                        state.status !== myConstClass.STATUS_NEW && (
+                          <DoneIcon fontSize="small"></DoneIcon>
+                        )
+                      }
+                    >
+                      {state.status === myConstClass.STATUS_NEW
+                        ? "Attest"
+                        : "Attested"}
+                    </Button>
+                  )}
+                  {((!state.createCasePage && state.questionTable.length > 0) ||
+                    (state.showTable && state.questionTable.length > 0)) && (
+                    <Button
+                      variant="outlined"
+                      style={{ marginLeft: "20px" }}
+                      //onClick={startConversation}
+                      disabled={
+                        state.status === myConstClass.STATUS_NEW ||
+                        state.status === myConstClass.STATUS_CANCEL ||
+                        state.status === myConstClass.STAUS_COMPLETE
+                      }
+                    >
+                      Initiate Chat
+                    </Button>
+                  )}
+
+                  {state.questionTable.length > 0 && (
+                    <Button
+                      style={{ marginLeft: "20px" }}
+                      variant="outlined"
+                      onClick={OpenWebLinkDialog}
+                      disabled={
+                        state.status === myConstClass.STATUS_NEW ||
+                        state.status === myConstClass.STATUS_CANCEL ||
+                        state.status === myConstClass.STAUS_COMPLETE
+                      }
+                    >
+                      {!state.emailChannelInitiated
+                        ? "Send WebLink"
+                        : "Re-send Weblink"}
+                    </Button>
+                  )}
+
+                  {state.questionTable.length > 0 && (
+                    <Button
+                      style={{ marginLeft: "20px" }}
+                      variant="outlined"
+                      onClick={handleDownload}
+                      startIcon={<DownloadIcon />}
+                    >
+                      Download as pdf
+                    </Button>
+                  )}
+
+                  {state.questionTable.length > 0 && (
+                    <Button
+                      style={{ marginLeft: "20px" }}
+                      variant="outlined"
+                      onClick={cancelDialog}
+                      disabled={
+                        state.status === myConstClass.STATUS_CANCEL ||
+                        state.status === myConstClass.STAUS_COMPLETE
+                      }
+                    >
+                      Cancel
+                    </Button>
+                  )}
+
+                  {state.questionTable.length > 0 && (
+                    <Button
+                      style={{ marginLeft: "20px" }}
+                      variant="outlined"
+                      onClick={completeDialog}
+                      
+                      disabled={
+                        state.questionTable.filter(
+                          (x) => x.OriginalAnswer === null
+                        ).length > 0 ||
+                        state.status === myConstClass.STATUS_CANCEL ||
+                        state.status === myConstClass.STAUS_COMPLETE
+                      }
+                    >
+                      COMPLETE
+                    </Button>
+                  )}
+                </Grid>
+              </React.Fragment>
+            )}
+            {state.createCasePage && !state.showTable && (
+              <React.Fragment>
+                <Grid
+                  item
+                  xs={12}
+                  alignItems="left"
+                  style={{
+                    textAlign: "left",
+                    marginLeft: "20px",
+                  }}
+                >
+                  <input
+                    accept="pdf/*"
+                    //className={classes.input}
+                    style={{ display: "none" }}
+                    id="raised-button-file"
+                    multiple
+                    type="file"
+                    onChange={handleFileChange}
+                    disabled={!state.createCasePage}
+                  />
+                  <label htmlFor="raised-button-file">
+                    <Button
+                      variant="contained"
+                      component="span"
+                      //className={classes.button}
+                    >
+                      Choose file
+                    </Button>
+                  </label>
+                  <label style={{ marginLeft: "10px" }}>
+                    {state.inpFileName ? state.inpFileName + " uploaded" : ""}
+                  </label>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  alignItems="left"
+                  style={{
+                    marginBottom: "20px",
+                    textAlign: "left",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    style={{ marginLeft: "20px" }}
+                    onClick={onSubmit}
+                    disabled={
+                      !state.createCasePage ||
+                      !(
+                        state.firstName !== "" &&
+                        state.lastName !== "" &&
+                        state.phoneNumber !== "" &&
+                        state.emailAddress !== "" &&
+                        state.inpFile != ""
+                      )
+                    }
+                  >
+                    Submit
+                  </Button>
+                </Grid>
+              </React.Fragment>
+            )}
+          </Grid>
+        </Paper>
+
+        {((!state.createCasePage && state.questionTable.length > 0) ||
+          state.showTable) && (
+          <React.Fragment>
+            <Grid container alignItems="center" style={{ marginTop: "20px" }}>
+              <Grid item xs={6}>
+                <Typography variant="h6" gutterBottom>
+                  Question List{" "}
+                </Typography>
+              </Grid>
               <Grid
                 item
-                xs={12}
-                style={{ border: "1px", borderColor: "black" }}
+                xs={6}
+                style={{ display: "flex", justifyContent: "flex-end" }}
               >
-                <div>
-                  <IconButton
-                    style={{ margin: "10px", float: "right" }}
-                    variant="contained"
-                    onClick={refresh}
-                  >
-                    <RefreshIcon />
-                  </IconButton>
-                  <h3 style={{ marginLeft: "15px", clear: "both" }}>
-                    Question List{" "}
-                  </h3>
-                </div>
-
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ width: "10%" }}>Case no</TableCell>
-                        {/* <TableCell>Case no</TableCell> */}
-                        <TableCell>S.No</TableCell>
-                        <TableCell style={{ width: "30%" }}>
-                          Original Question
-                        </TableCell>
-                        <TableCell style={{ width: "30%" }}>
-                          Formatted Question{" "}
-                        </TableCell>
-                        <TableCell>User response Web</TableCell>
-                        <TableCell>Message Sent</TableCell>
-                        <TableCell>Message Received</TableCell>
-                        <TableCell>Responses</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {state.questionTable.map((row) => (
-                        <TableRow key={row.Id}>
-                          <TableCell>{row.CaseId}</TableCell>
-                          <TableCell>{row.SequenceNumber}</TableCell>
-                          <TableCell>{row.OriginalQuestion}</TableCell>
-                          <TableCell>{row.StandardQuestion}</TableCell>
-                          <TableCell>{row.StandardAnswerWeb}</TableCell>
-                          <TableCell>
-                            {(row.MsgSent === 1 || row.MsgSent === true) && (
-                              <DoneIcon fontSize="small"></DoneIcon>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {(row.MsgReceived === 1 ||
-                              row.MsgReceived === true) && (
-                              <React.Fragment>
-                                <DoneIcon fontSize="small"></DoneIcon>
-                              </React.Fragment>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {(row.MsgReceived === 1 ||
-                              row.MsgReceived === true) && (
-                              <React.Fragment>
-                                <Button
-                                  variant="text"
-                                  onClick={() => viewResponse(row.Id)}
-                                >
-                                  View
-                                </Button>
-                              </React.Fragment>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <IconButton variant="contained" onClick={refresh}>
+                  <RefreshIcon />
+                </IconButton>
               </Grid>
-            </React.Fragment>
-          )}
-        </Grid>
-      </Box>
-    </React.Fragment>
+
+              <Grid item xs={12}>
+                <QuestionsTable
+                  rows={state.questionTable}
+                  viewResponse={viewResponse}
+                  emailChannelInitiated={state.emailChannelInitiated}
+                />
+              </Grid>
+            </Grid>
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    </Box>
   ) : (
     <Loading />
   );

@@ -38,7 +38,7 @@ exports.handler =async (event) => {
       } else {
         const request = new sql.Request();
 
-        const query = "SELECT * FROM cases";
+        const query = "select *,'' as CancelQueue from cases";
         request.query(query, (err, result) => {
           if (err) {
             reject(err);

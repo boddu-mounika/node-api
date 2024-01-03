@@ -62,11 +62,9 @@ exports.handler = async (event) => {
   //   })
   //   .promise();
 
-  console.log(`EVENT: ${JSON.stringify(event)}`);
+  //console.log(`EVENT: ${JSON.stringify(event)}`);
   let resp = "";
-  let prompt = "Who is presiden of India";
-  //console.log(prompt);
-  try {
+ try {
     questions = await promise;
     //console.log(result.recordset);
     await Promise.all(

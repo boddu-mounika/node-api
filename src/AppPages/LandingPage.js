@@ -1,36 +1,28 @@
 import * as React from "react";
-//import axios from "axios";
 import AddIcon from "@mui/icons-material/Add";
-import HomeIcon from "@mui/icons-material/Home";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Amplify, { API } from "aws-amplify";
-import Loading from "./ReusableComponents/Loading"
-import {
-  IconButton,
-  Button,
-  Table,
-  Grid,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Box,
-  CircularProgress
-} from "@mui/material";
+import { API } from "aws-amplify";
+import Loading from "./ReusableComponents/Loading";
+import HomePageTable from "./ReusableComponents/HomePageTable";
+import Typography from "@mui/material/Typography";
+import FilterBar from "./ReusableComponents/FilterBar";
+import * as myConstClass from "../Util/Constants";
+import RefreshIcon from "@mui/icons-material/Refresh";
+
+import { Button, Grid, Box } from "@mui/material";
 
 const myAPI = "api747c26ec";
 const path = "/customer";
-
-
 
 export default function BasicTextFields() {
   let initialState = {
     rows: [],
     columns: [],
     tableData: [],
-    isLoading:false
+    filteredTabledata: [],
+    isLoading: false,
+    selectedFilter: "",
   };
   const [state, setState] = useState(initialState);
 
@@ -39,88 +31,119 @@ export default function BasicTextFields() {
     fetchData();
   }, []);
 
-    const fetchData = () => {
-      //let customerId=1;
-       API.get(myAPI, path,{
-        headers:{
-            'Content-Type':'text/plain'
-        }
-      }).then((response) => {
+  const fetchData = async () => {
+    //let customerId=1;
+    await API.get(myAPI, path, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    })
+      .then((response) => {
         console.log(response);
-        setState({ ...state, tableData: response.recordset, isLoading:false });
-      }).catch((error) => {
+        response.recordset.forEach(element => {
+          if(element.Status.includes(",")) {
+            element.CancelQueue = element.Status;
+            element.Status=myConstClass.STATUS_CANCEL;            
+          } 
+        });
+        setState({
+          ...state,
+          tableData: response.recordset,
+          isLoading: false,
+          filteredTabledata: response.recordset,
+        });
+      })
+      .catch((error) => {
         console.error(error);
-      });;
-    };
+      });
+  };
 
-//   function fetchData() {
-//     let customerId = 1;
-//     alert("test-1");
-//     API.get(myAPI, path + "/" + customerId)
-//       .then((response) => {
-//         console.log(response);
-//         let newCustomers = [...customers];
-//         newCustomers.push(response);
-//         setCustomers(newCustomers);
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//       });
-//   }
+  const filterTbaleData = (filterType) => {
+    let filteredTabledata = [];
+    switch (filterType) {
+      case myConstClass.STATUS_NEW:
+        filteredTabledata = state.tableData.filter(
+          (x) => x.Status === myConstClass.STATUS_NEW
+        );
+        break;
+      case myConstClass.STATUS_ATTESTED:
+        filteredTabledata = state.tableData.filter(
+          (x) => x.Status === myConstClass.STATUS_ATTESTED
+        );
+        break;
+      case myConstClass.STATUS_AWAITING:
+        filteredTabledata = state.tableData.filter(
+          (x) => x.Status === myConstClass.STATUS_AWAITING
+        );
+        break;
+      case myConstClass.STAUS_COMPLETE:
+        filteredTabledata = state.tableData.filter(
+          (x) => x.Status === myConstClass.STAUS_COMPLETE
+        );
+        break;
+      case myConstClass.STATUS_ALL:
+        filteredTabledata = state.tableData.filter((x) => x.Status !== null);
+        break;
+      case myConstClass.STATUS_CANCEL:
+        filteredTabledata = state.tableData.filter(
+          (x) => x.Status === myConstClass.STATUS_CANCEL
+        );
+        break;
+    }
+    setState({
+      ...state,
+      filteredTabledata: filteredTabledata,
+      selectedFilter: filterType,
+    });
+  };
 
-return !state.isLoading ? (
-    <React.Fragment>
-      <Grid item xs={6}>
-        {/* <Link to="/">
-          <IconButton
-            style={{ margin: "10px" }}
-            variant="contained"
-            //onClick={goToHome}
-          >
-            <HomeIcon />
-          </IconButton>
-        </Link> */}
+  return !state.isLoading ? (
+    <Box
+      style={{ marginTop: "5%" }}
+      component="main"
+      sx={{ flexGrow: 1, p: 3 }}
+    >
+      {state.filteredTabledata.length > 0 && (
+        <React.Fragment>
+          <FilterBar
+            tableData={state.tableData}
+            filterTbaleData={filterTbaleData}
+            selectedFilter={state.selectedFilter}
+          />
+          <Grid container alignItems="center">
+            <Grid item xs={6}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                style={{ marginTop: "20px", marginBottom: "20px" }}
+              >
+                Case History
+              </Typography>
+            </Grid>
+            {!(state.selectedFilter === "" ||
+              state.selectedFilter === myConstClass.STATUS_ALL) && (
+                <Grid
+                  item
+                  xs={6}
+                  style={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Button
+                    onClick={() => filterTbaleData(myConstClass.STATUS_ALL)}
+                    variant="text"
+                    //disabled={awaitingListCount === 0}
+                    startIcon={<RefreshIcon />}
+                  >
+                    {"Reset Filters"}
+                  </Button>
+                </Grid>
+              )}
+          </Grid>
 
-        <Link to="/Case" state={{ selectedRow: null }}>
-          <Button variant="filled" startIcon={<AddIcon />}>
-            Create New Case
-          </Button>
-        </Link>
-      </Grid>
-      <h3 style={{ margin: "15px" }}>Case History </h3>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              {/* <TableCell>Case no</TableCell> */}
-              <TableCell>Full Name</TableCell>
-              <TableCell>Phone No </TableCell>
-              <TableCell>Email Id</TableCell>
-              <TableCell>Case No</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {state.tableData.map((row) => (
-              <TableRow key={row.Id}>
-                <TableCell>{row.Id}</TableCell>
-                <TableCell>{`${row.FirstName || ""} ${row.MiddleName || ""} ${
-                  row.LastName || ""
-                }`}</TableCell>
-                <TableCell>{row.PhoneNumber}</TableCell>
-                <TableCell>{row.EmailId}</TableCell>
-                <TableCell>
-                  <Link to="/Case" state={{ selectedRow: row }}>
-                    {row.CaseId}
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </React.Fragment>
-  ):(
+          <HomePageTable rows={state.filteredTabledata} />
+        </React.Fragment>
+      )}
+    </Box>
+  ) : (
     <Loading />
   );
 }

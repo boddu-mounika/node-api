@@ -84,6 +84,27 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/caseStatusUpdate/{status}": {
+      "name": "/caseStatusUpdate/{status}",
+      "lambdaFunction": "casestatusupdate",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/getResponses/{questionId}": {
+      "name": "/getResponses/{questionId}",
+      "lambdaFunction": "getResponses",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/sms": {
+      "name": "/sms",
+      "lambdaFunction": "sms",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

@@ -19,7 +19,7 @@
       "function": {
         "nodeapi6e355eb4": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/nodeapi6e355eb4-436848446f76582f696e-build.zip",
+          "s3Key": "amplify-builds/nodeapi6e355eb4-70465a4d524a556a7275-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "uploadfile": {
@@ -32,7 +32,7 @@
         },
         "getquestions": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/getquestions-7a763458475068764d6d-build.zip",
+          "s3Key": "amplify-builds/getquestions-4372596973535857334b-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "S3Trigger7661b19e": {
@@ -45,7 +45,7 @@
         },
         "submitcase": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/submitcase-2f793039393467444231-build.zip",
+          "s3Key": "amplify-builds/submitcase-4a564377644f4268476b-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "insertquestions": {
@@ -60,7 +60,7 @@
         },
         "email": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/email-7a595a2f5765554f4841-build.zip"
+          "s3Key": "amplify-builds/email-71427a5477684372696c-build.zip"
         },
         "getphonenumber": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
@@ -70,7 +70,7 @@
         "Chatgptcall": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/Chatgptcall-4c3052353541686b6153-build.zip",
+          "s3Key": "amplify-builds/Chatgptcall-2b4f6f694f4b57583965-build.zip",
           "chatgptPromptAnswer": "Rephrase the below senetence into attorney language:",
           "chatgptPrompt": "Convert this question into layman language:"
         },
@@ -83,6 +83,24 @@
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
           "s3Key": "amplify-builds/updatequestions-5332573262516c4d7031-build.zip"
+        },
+        "casestatusupdate": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/casestatusupdate-397254564667666e624e-build.zip"
+        },
+        "getResponses": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/getResponses-30717345735850764938-build.zip"
+        },
+        "sms": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/sms-5a43345675684d362b43-build.zip",
+          "relevancyCheckPrompt": "I have a question and answer. Can you check the relevancy and give me response in percentage.",
+          "key": "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",
+          "chatgptPromptAnswer": "Covert this answer to civil"
         }
       },
       "api": {

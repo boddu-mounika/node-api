@@ -3,9 +3,8 @@
 const aws = require("aws-sdk");
 
 exports.handler =async (event) => {
-    const id = event.pathParameters.id;
-    //console.log("Hellooooooooooooooooooooo"+id)
-  const { Parameters } = await new aws.SSM()
+    const id = event.pathParameters.questionId;
+    const { Parameters } = await new aws.SSM()
     .getParameters({
       Names: ["DB_USERNAME", "DB_PASS"].map(        
         (secretName) => process.env[secretName]
@@ -35,12 +34,9 @@ exports.handler =async (event) => {
         reject(err);
       } else {
         const request = new sql.Request();
-        request.input("caseId", sql.NVarChar, id);  
+        request.input("questionId", sql.NVarChar, id);  
       
-        const selectQuery =`select q.Id, q.SequenceNumber,q.MsgSentDateTime,  q.CaseId, q.MsgSent, q.MsgReceived, q.OriginalQuestion 
-        ,q.StandardQuestion,0 as IsModified,r.PiiInfo as PiiInfo,r.HasPiiInfo,  r.StandardAnswer, r.OriginalAnswer from questions q 
-                left outer join Webresponses r on q.Id = r.QuestionId and r.IsActive=1
-                where q.CaseId=@caseId order by q.SequenceNumber asc`;
+        const selectQuery =`SELECT * FROM WebResponses WHERE QuestionId = @questionId and IsActive=1`;
         request.query(selectQuery, (err, result) => {
           if (err) {
             reject(err);

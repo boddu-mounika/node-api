@@ -117,6 +117,30 @@
           ],
           "category": "function",
           "resourceName": "updatequestions"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "casestatusupdate"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getResponses"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "sms"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -160,8 +184,20 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "casestatusupdate": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "email": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getResponses": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -189,6 +225,12 @@
     },
     "nodeapi6e355eb4": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "sms": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -315,6 +357,30 @@
         }
       ]
     },
+    "AMPLIFY_function_casestatusupdate_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "casestatusupdate"
+        }
+      ]
+    },
+    "AMPLIFY_function_casestatusupdate_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "casestatusupdate"
+        }
+      ]
+    },
+    "AMPLIFY_function_casestatusupdate_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "casestatusupdate"
+        }
+      ]
+    },
     "AMPLIFY_function_email_deploymentBucketName": {
       "usedBy": [
         {
@@ -328,6 +394,30 @@
         {
           "category": "function",
           "resourceName": "email"
+        }
+      ]
+    },
+    "AMPLIFY_function_getResponses_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getResponses"
+        }
+      ]
+    },
+    "AMPLIFY_function_getResponses_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getResponses"
+        }
+      ]
+    },
+    "AMPLIFY_function_getResponses_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getResponses"
         }
       ]
     },
@@ -440,6 +530,54 @@
         {
           "category": "function",
           "resourceName": "nodeapi6e355eb4"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_chatgptPromptAnswer": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_relevancyCheckPrompt": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
+        }
+      ]
+    },
+    "AMPLIFY_function_sms_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sms"
         }
       ]
     },

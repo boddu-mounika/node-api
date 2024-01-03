@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "@aws-amplify/ui-react/styles.css";
 import {
   withAuthenticator,
@@ -14,63 +13,40 @@ import {
   Route
 } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
-import Amplify, { API } from "aws-amplify";
 import React, { useEffect, useState } from "react";
-// import Sample from "./SamplePages/SimpleStartPage";
-// import Sidebar from "./ChatGptPoc/Sidebar";
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import HomeIcon from "@mui/icons-material/Home";
-import AddIcon from "@mui/icons-material/Add";
-import { Link } from "react-router-dom";
+
 import AddNewCase  from "./AppPages/AddNewCase";
 import Home from "./AppPages/Home";
 import LandingPage from "./AppPages/LandingPage";
 import Submit from "./AppPages/SubmitForm/Submit"
+import Drawer from "./AppPages/ReusableComponents/Drawer"
 import styles from './App.css'
+import Sidebar from "./AppPages/ReusableComponents/Sidebar";
 import { ButtonBase } from "@mui/material";
+//import { makeStyles } from "@material-ui/core/styles";
 const myAPI = "api747c26ec";
 const path = "/customer";
 
+
+// const useStyles = makeStyles({
+//   container: {
+//     display: "flex"
+//   }
+// });
+
 function App({ signOut }) {
+  //const classes = useStyles();
   const location = useLocation();
   console.log(location);
   const [input, setInput] = useState("");
   const [customers, setCustomers] = useState([]);
   return (
-    <div>
+    <div style={{display:"flex"}}>
       {!location.pathname.includes('/submit') && (
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
-          <Toolbar variant="dense">
-            <Link to="/">
-              <IconButton
-                style={{ margin: "10px" }}
-                variant="contained"
-                //onClick={goToHome}
-              >
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" color="inherit" component="div">
-              Welcome! to Steve's Legit Hub
-            </Typography>
-            <Button onClick={signOut}style={{ position: 'absolute', top: '10px', right: '10px' }}>Sign Out</Button>
-          </Toolbar>
-        </AppBar>
-      </Box>)}
+
+      // <Box sx={{ flexGrow: 1 }}>
+        <Sidebar signOut={signOut} />
+      )}       
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
