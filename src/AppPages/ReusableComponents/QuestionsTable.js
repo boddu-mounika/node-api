@@ -11,6 +11,7 @@ import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import WarningIcon from "@mui/icons-material/Warning";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
+import MessageIcon from '@mui/icons-material/Message';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,15 +39,17 @@ export default function QuestionsTable(props) {
     {
       id: "MessageSent",
       label: "Msg Sent",
-      minWidth: "100px",
-      // align: 'right',
+      minWidth: "120px",
+      align: 'center',
       format: (row) => {
         return (
           <React.Fragment>
             {props.emailChannelInitiated && (
-            <MarkEmailReadIcon fontSize="small"></MarkEmailReadIcon>)}
+            <MarkEmailReadIcon fontSize="small" style={{color:"green"}}></MarkEmailReadIcon>)}
             {row.MsgSent && (
-            <MarkEmailReadIcon fontSize="small"></MarkEmailReadIcon>)}
+              <div style={{margingLeft:"10px !important"}}>
+            <MessageIcon fontSize="small" style={{color:"green"}}></MessageIcon>
+            </div>)}
           </React.Fragment>
         );
       },
@@ -56,7 +59,7 @@ export default function QuestionsTable(props) {
       label: "PII",
       //minWidth: 60,
       format: (row) => {
-        return row.HasPiiInfo === 1 && <WarningIcon fontSize="small" />;
+        return row.HasPiiInfo === 1 && <WarningIcon fontSize="small" style={{color:"#FFA500"}} />;
       },
     },
     {

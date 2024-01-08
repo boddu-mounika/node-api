@@ -34,7 +34,7 @@ exports.handler = async (event) => {
   }
 
   const { emailAddress, subject, message, usebody } = formdata;
-  const body = usebody
+  const body = usebody === true || usebody==="true"
     ? message
     : `
   <html>

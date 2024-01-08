@@ -44,7 +44,7 @@ export default function WeblinkDialog(props) {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={props.handleClose}>Cancel</Button>
+              <Button onClick={props.handleClose}>Close</Button>
             </DialogActions>
           </React.Fragment>
         )}

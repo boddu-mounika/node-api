@@ -696,6 +696,7 @@ export default function Home(props) {
         chatInitiatedForCase={state.chatInitiatedForCase}
         startConversation={startConversation}
         handleClose={handleDialogClose}
+        phoneNumber = {state.phoneNumber}
       />
 
       <React.Fragment>
@@ -818,7 +819,7 @@ export default function Home(props) {
                       }
                       startIcon={
                         state.status !== myConstClass.STATUS_NEW && (
-                          <DoneIcon fontSize="small"></DoneIcon>
+                          <DoneIcon fontSize="small" style={{color:"green"}}></DoneIcon>
                         )
                       }
                     >
@@ -841,7 +842,7 @@ export default function Home(props) {
                       }
                       startIcon={
                         state.chatInitiatedForCase && (
-                          <DoneIcon fontSize="small"></DoneIcon>
+                          <DoneIcon fontSize="small" style={{color:"green"}}></DoneIcon>
                         )
                       }
                     >
@@ -860,6 +861,11 @@ export default function Home(props) {
                         state.status === myConstClass.STATUS_NEW ||
                         state.status === myConstClass.STATUS_CANCEL ||
                         state.status === myConstClass.STAUS_COMPLETE
+                      }
+                      startIcon={
+                        state.emailChannelInitiated && (
+                          <DoneIcon fontSize="small" style={{color:"green"}}></DoneIcon>
+                        )
                       }
                     >
                       {!state.emailChannelInitiated

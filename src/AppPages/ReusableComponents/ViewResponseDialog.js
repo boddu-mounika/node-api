@@ -26,13 +26,13 @@ export default function ViewResponseDialog(props) {
           </DialogContentText>
           <br />
           <DialogContentText id="alert-dialog-slide-description">
-            <span style={{ color: "black" }}>Chatgpt Response:</span>
+            <span style={{ color: "black" }}>AI Response:</span>
             {" " + props.row.OriginalAnswer}
           </DialogContentText>
           <br />
           {props.row.HasPiiInfo === 1 && (
             <DialogContentText id="alert-dialog-slide-description">
-              <span style={{ color: "black" }}>Pii text:</span>
+              <span style={{ color: "black" }}>PII Info:</span>
               {" " + props.row.PiiInfo.replace(",", "")}
             </DialogContentText>
           )}

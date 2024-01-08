@@ -24,6 +24,9 @@ export default function WeblinkDialog(props) {
               <DialogContentText id="alert-dialog-description">
                 {"Are you sure you want to initiate chat with client for this case."}
               </DialogContentText>
+              <DialogContentText id="alert-dialog-description">
+                {"Phone number: +1 "+props.phoneNumber}
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={props.handleClose}>Cancel</Button>
@@ -42,7 +45,7 @@ export default function WeblinkDialog(props) {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={props.handleClose}>Cancel</Button>
+              <Button onClick={props.handleClose}>Close</Button>
             </DialogActions>
           </React.Fragment>
         )}

@@ -60,7 +60,7 @@
         },
         "email": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/email-5678694571582f545765-build.zip"
+          "s3Key": "amplify-builds/email-587a393662505a445765-build.zip"
         },
         "getphonenumber": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
@@ -97,7 +97,7 @@
         "sms": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/sms-787a446c68354341635a-build.zip",
+          "s3Key": "amplify-builds/sms-4e5253684532666c6769-build.zip",
           "relevancyCheckPrompt": "I have a question and answer. Can you check the relevancy and give me response in percentage.",
           "chatgptPromptAnswer": "Covert this answer to civil"
         },

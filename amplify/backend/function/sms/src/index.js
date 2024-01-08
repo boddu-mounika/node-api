@@ -98,7 +98,10 @@ exports.handler = async (event) => {
     console.log("SEND SMS STEP");
     console.log(process.env.AWS_REGION);
     const ses = new aws.SES({ region: process.env.AWS_REGION });
-    let emailBody = "Here is your next question \n"
+    let emailBody = "";
+    emailBody !== "Your response seems to be irrelevant. Please respond again"
+      ? "Here is your next question \n\n"
+      : "";
     emailBody += message ? message : question.StandardQuestion;
 
     const params = {
@@ -307,7 +310,9 @@ exports.handler = async (event) => {
           "Access-Control-Allow-Headers": "*",
           "Content-Type": "text/plain",
         },
-        body: JSON.stringify(result),
+        body: JSON.stringify(
+          "Response recorded Please reply to next question."
+        ),
       };
       return response;
     } catch (e) {
@@ -333,7 +338,9 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "*",
         "Content-Type": "text/plain",
       },
-      body: JSON.stringify("Response seems irrelevant. Please sen your response again."),
+      body: JSON.stringify(
+        "Response seems irrelevant. Please send your response again."
+      ),
     };
     return response;
   }
