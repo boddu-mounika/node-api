@@ -88,6 +88,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "initiateSms": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "insertquestions": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
@@ -96,6 +103,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Region": "string"
     },
     "nodeapi6e355eb4": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "nodeapiad2c0f7c": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
@@ -117,6 +131,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Region": "string"
     },
     "submitcase": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "updateResponsePdf": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",

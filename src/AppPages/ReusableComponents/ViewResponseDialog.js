@@ -1,14 +1,15 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import * as React from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
 
 export default function ViewResponseDialog(props) {
-  let date = new Date().toLocaleDateString('en-US');
+  let date = new Date().toLocaleDateString("en-US");
   return (
     <React.Fragment>
       <Dialog
@@ -20,14 +21,25 @@ export default function ViewResponseDialog(props) {
         <DialogTitle>{"Responses"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Client Answer:
-            {props.standardAnswer}
+            <span style={{ color: "black" }}>Client Response:</span>
+            {" " + props.row.StandardAnswer}
           </DialogContentText>
+          <br />
           <DialogContentText id="alert-dialog-slide-description">
-            Converted Answer:
-            {props.originalAnswer}
+            <span style={{ color: "black" }}>Chatgpt Response:</span>
+            {" " + props.row.OriginalAnswer}
           </DialogContentText>
+          <br />
+          {props.row.HasPiiInfo === 1 && (
+            <DialogContentText id="alert-dialog-slide-description">
+              <span style={{ color: "black" }}>Pii text:</span>
+              {" " + props.row.PiiInfo.replace(",", "")}
+            </DialogContentText>
+          )}
         </DialogContent>
+        <DialogActions>
+          <Button onClick={props.handleDialogClose}>Cancel</Button>
+        </DialogActions>
       </Dialog>
     </React.Fragment>
   );

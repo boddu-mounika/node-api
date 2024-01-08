@@ -27,7 +27,7 @@ export default function QuestionsTable(props) {
     { id: "SequenceNumber", label: "S.No", width: "3%" },
     {
       id: "OriginalQuestion",
-      label: "OriginalQuestion",
+      label: "Original Question",
       width: "20%",
     },
     {
@@ -37,14 +37,17 @@ export default function QuestionsTable(props) {
     },
     {
       id: "MessageSent",
-      label: "Message Sent",
-      //minWidth: 60,
+      label: "Msg Sent",
+      minWidth: "100px",
       // align: 'right',
       format: (row) => {
         return (
-          props.emailChannelInitiated && (
-            <MarkEmailReadIcon fontSize="small"></MarkEmailReadIcon>
-          )
+          <React.Fragment>
+            {props.emailChannelInitiated && (
+            <MarkEmailReadIcon fontSize="small"></MarkEmailReadIcon>)}
+            {row.MsgSent && (
+            <MarkEmailReadIcon fontSize="small"></MarkEmailReadIcon>)}
+          </React.Fragment>
         );
       },
     },
@@ -62,7 +65,7 @@ export default function QuestionsTable(props) {
       //minWidth: 80,
       format: (row) => {
         return (
-          row.StandardAnswer !== null &&
+          row.StandardAnswer !== null && row.StandardAnswer !== undefined && 
           row.StandardAnswer.length > 0 && (
             <React.Fragment>
               <Button variant="text" onClick={() => props.viewResponse(row)}>

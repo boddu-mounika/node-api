@@ -11,10 +11,6 @@
       "environmentVariableName": "RELEVANCY_CHECK_PROMPT"
     },
     {
-      "cloudFormationParameterName": "key",
-      "environmentVariableName": "key"
-    },
-    {
       "cloudFormationParameterName": "chatgptPromptAnswer",
       "environmentVariableName": "CHATGPT_PROMPT_ANSWER"
     }

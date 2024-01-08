@@ -32,7 +32,7 @@
         },
         "getquestions": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/getquestions-4372596973535857334b-build.zip",
+          "s3Key": "amplify-builds/getquestions-4747435a6d51664d3741-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "S3Trigger7661b19e": {
@@ -45,7 +45,7 @@
         },
         "submitcase": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/submitcase-4a564377644f4268476b-build.zip",
+          "s3Key": "amplify-builds/submitcase-61596e49334f4b77657a-build.zip",
           "secretsPathAmplifyAppId": "d2u1maonugm0ya"
         },
         "insertquestions": {
@@ -60,7 +60,7 @@
         },
         "email": {
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/email-71427a5477684372696c-build.zip"
+          "s3Key": "amplify-builds/email-5678694571582f545765-build.zip"
         },
         "getphonenumber": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
@@ -70,7 +70,7 @@
         "Chatgptcall": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/Chatgptcall-2b4f6f694f4b57583965-build.zip",
+          "s3Key": "amplify-builds/Chatgptcall-386430704d784d566d6c-build.zip",
           "chatgptPromptAnswer": "Rephrase the below senetence into attorney language:",
           "chatgptPrompt": "Convert this question into layman language:"
         },
@@ -97,10 +97,23 @@
         "sms": {
           "secretsPathAmplifyAppId": "d2u1maonugm0ya",
           "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
-          "s3Key": "amplify-builds/sms-5a43345675684d362b43-build.zip",
+          "s3Key": "amplify-builds/sms-787a446c68354341635a-build.zip",
           "relevancyCheckPrompt": "I have a question and answer. Can you check the relevancy and give me response in percentage.",
-          "key": "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",
           "chatgptPromptAnswer": "Covert this answer to civil"
+        },
+        "nodeapiad2c0f7c": {
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/nodeapiad2c0f7c-6e563659304854727573-build.zip"
+        },
+        "initiateSms": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/initiateSms-554b49377a534476707a-build.zip"
+        },
+        "updateResponsePdf": {
+          "secretsPathAmplifyAppId": "d2u1maonugm0ya",
+          "deploymentBucketName": "amplify-amplify3c5e3687be3c4-staging-160721-deployment",
+          "s3Key": "amplify-builds/updateResponsePdf-494a4e4c415a41434d66-build.zip"
         }
       },
       "api": {

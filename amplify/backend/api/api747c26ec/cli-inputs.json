@@ -105,6 +105,27 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/test/{id}": {
+      "name": "/test/{id}",
+      "lambdaFunction": "nodeapiad2c0f7c",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/initiateSms/{id}": {
+      "name": "/initiateSms/{id}",
+      "lambdaFunction": "initiateSms",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/updateResponsePdf/{id}": {
+      "name": "/updateResponsePdf/{id}",
+      "lambdaFunction": "updateResponsePdf",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

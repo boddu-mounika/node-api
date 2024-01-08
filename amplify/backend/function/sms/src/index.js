@@ -1,3 +1,17 @@
+/*
+Use the following code to retrieve configured secrets from SSM:
+
+const aws = require('aws-sdk');
+
+const { Parameters } = await (new aws.SSM())
+  .getParameters({
+    Names: ["DB_USERNAME","DB_PASS","cgkey"].map(secretName => process.env[secretName]),
+    WithDecryption: true,
+  })
+  .promise();
+
+Parameters will be of the form { Name: 'secretName', Value: 'secretValue', ... }[]
+*/
 const aws = require("aws-sdk");
 const axios = require("axios");
 
@@ -84,7 +98,8 @@ exports.handler = async (event) => {
     console.log("SEND SMS STEP");
     console.log(process.env.AWS_REGION);
     const ses = new aws.SES({ region: process.env.AWS_REGION });
-    let emailBody = message ? message : question.StandardQuestion;
+    let emailBody = "Here is your next question \n"
+    emailBody += message ? message : question.StandardQuestion;
 
     const params = {
       Destination: {
@@ -94,7 +109,7 @@ exports.handler = async (event) => {
         Body: {
           Text: { Data: emailBody },
         },
-        Subject: { Data: "Send response" },
+        Subject: { Data: "Action requried. Awaiting response!" },
       },
       Source: "mukkaaditya@gmail.com",
     };
@@ -257,10 +272,10 @@ exports.handler = async (event) => {
           let insertionQuery = "";
           if (nextQuestion !== null && nextQuestion !== undefined) {
             request.input("NextQuesId", sql.Int, nextQuestion.Id);
-            insertionQuery += `UPDATE Questions set MsgSent = 1 where Id=@NextQuesId;`;
+            insertionQuery += `UPDATE Questions set MsgSent = 1,MsgSentDateTime=getdate() where Id=@NextQuesId;`;
           }
           insertionQuery += ` UPDATE Questions set MsgReceived=1 where Id=@QuestionId;
-            INSERT INTO [WebResponses] (StandardAnswer,Channel,OriginalAnswer,HasPiiInfo,PiiInfo,QuestionId,CaseId,InsertedTimeStamp) VALUES (@StandardAnswer,@Channel,@OriginalAnswer,@HasPiiInfo,@PiiInfo,@QuestionId,@CaseId,getDate())`;
+            INSERT INTO [WebResponses] (StandardAnswer,Channel,OriginalAnswer,HasPiiInfo,PiiInfo,QuestionId,CaseId,InsertedTimeStamp,IsActive) VALUES (@StandardAnswer,@Channel,@OriginalAnswer,@HasPiiInfo,@PiiInfo,@QuestionId,@CaseId,getDate(),1)`;
           //let values = JSON.parse(req.body.insertObj);
           request.query(insertionQuery, (err, result) => {
             if (err) {
@@ -318,7 +333,7 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Headers": "*",
         "Content-Type": "text/plain",
       },
-      body: JSON.stringify("Message Sent Succefully"),
+      body: JSON.stringify("Response seems irrelevant. Please sen your response again."),
     };
     return response;
   }

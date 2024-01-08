@@ -33,14 +33,22 @@ exports.handler = async (event) => {
     console.log(formdata);
   }
 
-  const { emailAddress, subject, message } = formdata;
-  const body = "Please click on below link to submit your responses " + message;
+  const { emailAddress, subject, message, usebody } = formdata;
+  const body = usebody
+    ? message
+    : `
+  <html>
+  <body>
+    <p>Hello,</p>
+    <p>Your case is being looked into. We kindly request your cooperation by providing your responses.</p>
+    <p>Please click on below to submit your responses. \n ${message}</p>
+    <p>NOTE: THIS EMAIL WAS SENT USING AN AUTOMATED EMAIL SYSTEM. PLEASE DO NOT RESPOND TO THIS EMAIL, AS THIS EMAIL INBOX IS NOT MONITORED.</p>
+    <p>Thank you.</p>
+  </body>
+  </html>
+`;
   console.log(event);
   console.log("1: " + message);
-
-  console.log(process.env.AWS_SECRET_ACCESS_KEY);
-  console.log(process.env.AWS_ACCESS_KEY_ID);
-  console.log(process.env.AWS_REGION);
 
   const ses = new AWS.SES({ region: process.env.AWS_REGION });
 
@@ -50,7 +58,7 @@ exports.handler = async (event) => {
     },
     Message: {
       Body: {
-        Text: { Data: body },
+        Html: { Data: body },
       },
       Subject: { Data: subject },
     },

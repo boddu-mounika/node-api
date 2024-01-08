@@ -14,7 +14,7 @@ export default function Breadcrumb(props) {
   return (
     <div role="presentation" onClick={handleClick}>
       <Breadcrumbs separator="›" aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/" onClick={() => navigate("/")}>
+        <Link underline="hover" color="rgb(25, 118, 210)" href="/" onClick={() => navigate("/")}>
           Home
         </Link>
         {/* <Link

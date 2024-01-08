@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
 import AttestDialog from "./ReusableComponents/AttestDialog";
 import * as myConstClass from "../Util/Constants";
+import ChatDialog from "./ReusableComponents/ChatDialog";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import WarningIcon from "@mui/icons-material/Warning";
 import Breadcrumb from "./ReusableComponents/Breadcrumb";
@@ -24,6 +25,7 @@ import Typography from "@mui/material/Typography";
 import { Auth } from "aws-amplify";
 import CancelDialog from "./ReusableComponents/CancelDialog";
 import CompleteDialog from "./ReusableComponents/CompleteDialog";
+import WordGenerator from "./ReusableComponents/WordGenerator";
 import {
   PDFDownloadLink,
   Page,
@@ -101,6 +103,7 @@ export default function Home(props) {
     showResponsesDialog: false,
     showSendWebLinkDialog: false,
     standardAnswer: "",
+    viewresponserow: {},
     originalAnswer: "",
     s3bucketfileName: "",
     isNewLoading: false,
@@ -112,6 +115,8 @@ export default function Home(props) {
     cancelConfirmation: false,
     showCompleteDialog: false,
     completeConfirmation: false,
+    showChatDiaolog: false,
+    responseFileName: "",
   };
   const [state, setState] = useState(initialState);
 
@@ -124,7 +129,7 @@ export default function Home(props) {
       location.state.selectedRow !== null &&
       selectedRow !== null
     ) {
-      const { selectedRow } = location.state;
+      let { selectedRow } = location.state;
       setState({ ...state, isLoading: true });
       let path = "/getQuestions";
       let tableData = [];
@@ -140,7 +145,10 @@ export default function Home(props) {
           },
         }).then(async (response) => {
           console.log(response);
-          tableData = await response.recordset;
+          tableData = await response.recordsets[1];
+          selectedRow = response.recordsets[0][0];
+          console.log("----------------------------------------------");
+          console.log(response.recordsets[0]);
           console.log(tableData);
         });
         // let status = selectedRow.Status;
@@ -158,16 +166,23 @@ export default function Home(props) {
           middleName: selectedRow.MiddleName,
           phoneNumber: selectedRow.PhoneNumber,
           emailAddress: selectedRow.EmailId,
-          chatInitiatedForCase: selectedRow.ChatInitiated,
+          //chatInitiatedForCase: selectedRow.ChatInitiated,
           s3bucketfileName: selectedRow.s3BucketFileName,
           createCasePage: false,
           caseId: selectedRow.Id,
           caseNumber: selectedRow.CaseId,
           isLoading: false,
-          status: selectedRow.Status,
-          cancelQueue: selectedRow.CancelQueue,
+          status: selectedRow.Status.includes(",")
+            ? myConstClass.STATUS_CANCEL
+            : selectedRow.Status,
+          cancelQueue: selectedRow.Status.includes(",")
+            ? selectedRow.status
+            : "",
           emailChannelInitiated:
             selectedRow.EmailInitiated === null ? false : true,
+          chatInitiatedForCase:
+            selectedRow.ChatInitiated === null ? false : true,
+          responseFileName: selectedRow.ResponseFileName,
         });
       }
       getData();
@@ -196,11 +211,13 @@ export default function Home(props) {
       showResponsesDialog: true,
       standardAnswer: row.StandardAnswer,
       originalAnswer: row.OriginalAnswer,
+      viewresponserow: row,
     });
   };
 
   const SendWebLink = async () => {
     setState({ ...state, isLoading: true });
+    let subject = "ACTION REQUIRED: " + state.caseNumber + " Response form";
     console.log(state.caseId);
     console.log(state.caseNumber);
     const key =
@@ -210,13 +227,14 @@ export default function Home(props) {
       "-" +
       state.caseNumber.split(" ").join("");
     console.log(process.env.FORM_LINK);
-    const body = `$https://main.d1rrqzqg8fxd0a.amplifyapp.com/submit/${key}`;
+    const body = `https://main.d1rrqzqg8fxd0a.amplifyapp.com/submit/${key}`;
     console.log(body);
     const path = "/email";
     const formData = new FormData();
     formData.append("emailAddress", state.emailAddress);
-    formData.append("subject", "Submit form");
+    formData.append("subject", subject);
     formData.append("message", body.toString());
+    formData.append("usebody", false);
 
     const result = await API.post(myAPI, path, {
       headers: {
@@ -266,58 +284,47 @@ export default function Home(props) {
       }
     ).then(async (response) => {
       console.log(response);
-      questions = await response.recordset;
+      questions = await response.recordsets[1];
       console.log(questions);
     });
     setState({ ...state, questionTable: questions, isLoading: false });
   };
 
-  // const startConversation = async () => {
-  //   setState({ ...state, isLoading: true });
-
-  //   //Get first question
-  //   let tableData = [];
-  //   let UpdatedTable1 = null;
-  //   console.log(state.insertedId);
-  //   console.log(state.caseId);
-  //   const formData = new FormData();
-  //   formData.append(
-  //     "insertedId",
-  //     state.insertedId === 0 ? state.caseId : state.insertedId
-  //   );
-  //   await axios
-  //     .post("http://localhost:5000/getFirstQuestion", formData)
-  //     .then(async (response) => {
-  //       console.log(response);
-  //       let prompt =
-  //         "Give me below interogatory question in layman language so that my client can easily answer ";
-  //       console.log(prompt + ":" + response.data.recordset[0].OriginalQuestion);
-  //       const chatgptreply = await chatGptCall(
-  //         prompt + response.data.recordset[0].OriginalQuestion
-  //       );
-  //       console.log(chatgptreply);
-  //       UpdatedTable1 = await sendSms(
-  //         chatgptreply,
-  //         response.data.recordset[0].Id,
-  //         response.data.recordset[0].SequenceNumber
-  //       );
-  //       //routeChange();
-  //       const formData = new FormData();
-  //       formData.append(
-  //         "insertedId",
-  //         state.insertedId === 0 ? state.caseId : state.insertedId
-  //       );
-  //     });
-  //   //setState({...state, questionTable: [], showTable:true});
-  //   setState({
-  //     ...state,
-  //     chatInitiatedForCase: true,
-  //     questionTable: UpdatedTable1,
-  //     showTable: true,
-  //     isLoading: false,
-  //   });
-  // };
-
+  const startConversation = async () => {
+    setState({ ...state, isLoading: true });
+    const path = "/initiateSms";
+    const emailPath = "/email";
+    const formData = new FormData();
+    const question = state.questionTable.filter(
+      (x) => x.SequenceNumber === 1
+    )[0];
+    let message =
+      "Your case is being looked into. Here is your first query. Please respond. \n " +
+      question.StandardQuestion;
+    console.log(question);
+    formData.append("emailAddress", state.emailAddress);
+    formData.append("usebody", true);
+    formData.append("subject", "Please respond to below question");
+    formData.append("message", message);
+    const result = await API.post(myAPI, emailPath, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+      body: formData,
+    }).then(async () => {
+      await API.post(myAPI, path + "/" + state.caseId + "-" + question.Id);
+    });
+    let questionTemp = [...state.questionTable];
+    questionTemp.filter((x) => x.SequenceNumber === 1)[0].MsgSent = 1;
+    setState({
+      ...state,
+      chatInitiatedForCase: true,
+      isLoading: false,
+      questionTable: questionTemp,
+      status: myConstClass.STATUS_AWAITING,
+    });
+  };
+  
   const sendSms = async (question, Id, SNo) => {
     let Updatedtable = null;
     const formData = new FormData();
@@ -371,10 +378,12 @@ export default function Home(props) {
     }
   };
 
-  const handleDownload = async (filename) => {
+  const handleDownload = async (filename, updateState) => {
     try {
-      const response = await Storage.get(state.s3bucketfileName);
+      const response = await Storage.get(filename);
       console.log(response);
+      if(updateState)
+        setState({...state,responseFileName:filename})
       window.open(response); // Open the file URL in a new tab for download
     } catch (error) {
       console.error("Error downloading file", error);
@@ -499,7 +508,7 @@ export default function Home(props) {
           },
         }).then((resultset) => {
           console.log(resultset);
-          insertedQuestions = resultset.recordset;
+          insertedQuestions = resultset.recordsets[1];
           API.get(myAPI, path4 + "/" + insertedId);
         });
       });
@@ -553,6 +562,10 @@ export default function Home(props) {
       status: myConstClass.STAUS_COMPLETE,
     });
   };
+
+  const changeIsLoading = () => {
+    setState({...state, isLoading:!state.isLoading});
+  }
 
   const handleCancel = async () => {
     setState({ ...state, isLoading: true });
@@ -613,7 +626,12 @@ export default function Home(props) {
       cancelConfirmation: false,
       showCompleteDialog: false,
       completeConfirmation: false,
+      showChatDiaolog: false,
     });
+  };
+
+  const chatDialog = () => {
+    setState({ ...state, showChatDiaolog: true });
   };
 
   const cancelDialog = () => {
@@ -645,8 +663,7 @@ export default function Home(props) {
         open={state.showResponsesDialog}
         Transition={Transition}
         handleDialogClose={handleDialogClose}
-        standardAnswer={state.standardAnswer}
-        originalAnswer={state.originalAnswer}
+        row={state.viewresponserow}
       />
 
       <WebllinkDialog
@@ -673,6 +690,12 @@ export default function Home(props) {
         completeConfirmation={state.completeConfirmation}
         handleClose={handleDialogClose}
         handleComplete={handleComplete}
+      />
+      <ChatDialog
+        open={state.showChatDiaolog}
+        chatInitiatedForCase={state.chatInitiatedForCase}
+        startConversation={startConversation}
+        handleClose={handleDialogClose}
       />
 
       <React.Fragment>
@@ -809,14 +832,22 @@ export default function Home(props) {
                     <Button
                       variant="outlined"
                       style={{ marginLeft: "20px" }}
-                      //onClick={startConversation}
+                      onClick={chatDialog}
                       disabled={
                         state.status === myConstClass.STATUS_NEW ||
                         state.status === myConstClass.STATUS_CANCEL ||
-                        state.status === myConstClass.STAUS_COMPLETE
+                        state.status === myConstClass.STAUS_COMPLETE ||
+                        state.chatInitiatedForCase
+                      }
+                      startIcon={
+                        state.chatInitiatedForCase && (
+                          <DoneIcon fontSize="small"></DoneIcon>
+                        )
                       }
                     >
-                      Initiate Chat
+                      {!state.chatInitiatedForCase
+                        ? "Initiate Chat"
+                        : "Chat Initiated"}
                     </Button>
                   )}
 
@@ -835,18 +866,7 @@ export default function Home(props) {
                         ? "Send WebLink"
                         : "Re-send Weblink"}
                     </Button>
-                  )}
-
-                  {state.questionTable.length > 0 && (
-                    <Button
-                      style={{ marginLeft: "20px" }}
-                      variant="outlined"
-                      onClick={handleDownload}
-                      startIcon={<DownloadIcon />}
-                    >
-                      Download as pdf
-                    </Button>
-                  )}
+                  )}                  
 
                   {state.questionTable.length > 0 && (
                     <Button
@@ -867,7 +887,6 @@ export default function Home(props) {
                       style={{ marginLeft: "20px" }}
                       variant="outlined"
                       onClick={completeDialog}
-                      
                       disabled={
                         state.questionTable.filter(
                           (x) => x.OriginalAnswer === null
@@ -879,6 +898,16 @@ export default function Home(props) {
                       COMPLETE
                     </Button>
                   )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  style={{
+                    marginBottom: "20px",
+                    textAlign: "left",
+                    marginLeft: "20px",
+                  }}
+                >                  
                 </Grid>
               </React.Fragment>
             )}
@@ -962,12 +991,31 @@ export default function Home(props) {
                 xs={6}
                 style={{ display: "flex", justifyContent: "flex-end" }}
               >
+                {state.questionTable.length > 0 && (
+                    <Button
+                      style={{ marginLeft: "20px" }}
+                      variant="outlined"
+                      onClick={() => handleDownload(state.s3bucketfileName,false)}
+                      startIcon={<DownloadIcon />}
+                    >
+                      Questionnaire
+                    </Button>
+                  )}
+                  {state.status === myConstClass.STAUS_COMPLETE && (
+                  <WordGenerator
+                    caseid={state.caseId}
+                    handleDownload={handleDownload}
+                    responseFileName={state.responseFileName}
+                    questionTable={state.questionTable}
+                    changeIsLoading={changeIsLoading}
+                  />
+                  )}
                 <IconButton variant="contained" onClick={refresh}>
                   <RefreshIcon />
                 </IconButton>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{marginTop:"10px"}}>
                 <QuestionsTable
                   rows={state.questionTable}
                   viewResponse={viewResponse}

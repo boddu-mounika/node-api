@@ -1,13 +1,17 @@
-
+// /*
+// Use the following code to retrieve configured secrets from SSM:
 
 const aws = require("aws-sdk");
+//const app = express();
+//const cors = require("cors");
+//app.use(cors());
 
 exports.handler =async (event) => {
-    const id = event.pathParameters.id;
-    //console.log("Hellooooooooooooooooooooo"+id)
+  const caseId  = event.pathParameters.id.split("-")[0]
+  const questionId = event.pathParameters.id.split("-")[1];
   const { Parameters } = await new aws.SSM()
     .getParameters({
-      Names: ["DB_USERNAME", "DB_PASS"].map(        
+      Names: ["DB_USERNAME", "DB_PASS"].map(
         (secretName) => process.env[secretName]
       ),
       WithDecryption: true,
@@ -35,14 +39,11 @@ exports.handler =async (event) => {
         reject(err);
       } else {
         const request = new sql.Request();
-        request.input("caseId", sql.NVarChar, id);  
-      
-        const selectQuery =`select * from cases where id=@caseId;
-        select q.Id, q.SequenceNumber,q.MsgSentDateTime,  q.CaseId, q.MsgSent, q.MsgReceived, q.OriginalQuestion 
-        ,q.StandardQuestion,0 as IsModified,r.PiiInfo as PiiInfo,r.HasPiiInfo,  r.StandardAnswer, r.OriginalAnswer from questions q 
-                left outer join Webresponses r on q.Id = r.QuestionId and r.IsActive=1
-                where q.CaseId=@caseId order by q.SequenceNumber asc`;
-        request.query(selectQuery, (err, result) => {
+        request.input("caseId", sql.Int, caseId);
+        request.input("questionId", sql.Int, questionId);
+        let query = `update cases set ChatInitiated = getdate(), status='AWAITING' where Id=@caseId; 
+         update questions set MsgSent = 1,MsgSentDateTime=getdate() where id=@questionId`;
+        request.query(query, (err, result) => {
           if (err) {
             reject(err);
           } else {

@@ -141,6 +141,30 @@
           ],
           "category": "function",
           "resourceName": "sms"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "nodeapiad2c0f7c"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "initiateSms"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "updateResponsePdf"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -217,6 +241,12 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "initiateSms": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "insertquestions": {
       "build": true,
       "dependsOn": [],
@@ -224,6 +254,11 @@
       "service": "Lambda"
     },
     "nodeapi6e355eb4": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "nodeapiad2c0f7c": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -242,6 +277,12 @@
     },
     "submitcase": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateResponsePdf": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -485,6 +526,30 @@
         }
       ]
     },
+    "AMPLIFY_function_initiateSms_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "initiateSms"
+        }
+      ]
+    },
+    "AMPLIFY_function_initiateSms_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "initiateSms"
+        }
+      ]
+    },
+    "AMPLIFY_function_initiateSms_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "initiateSms"
+        }
+      ]
+    },
     "AMPLIFY_function_insertquestions_deploymentBucketName": {
       "usedBy": [
         {
@@ -533,6 +598,22 @@
         }
       ]
     },
+    "AMPLIFY_function_nodeapiad2c0f7c_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "nodeapiad2c0f7c"
+        }
+      ]
+    },
+    "AMPLIFY_function_nodeapiad2c0f7c_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "nodeapiad2c0f7c"
+        }
+      ]
+    },
     "AMPLIFY_function_sms_chatgptPromptAnswer": {
       "usedBy": [
         {
@@ -542,14 +623,6 @@
       ]
     },
     "AMPLIFY_function_sms_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "sms"
-        }
-      ]
-    },
-    "AMPLIFY_function_sms_key": {
       "usedBy": [
         {
           "category": "function",
@@ -626,6 +699,30 @@
         {
           "category": "function",
           "resourceName": "submitcase"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateResponsePdf_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateResponsePdf"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateResponsePdf_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateResponsePdf"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateResponsePdf_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateResponsePdf"
         }
       ]
     },

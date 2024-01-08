@@ -103,7 +103,7 @@ export default function BasicTextFields() {
       component="main"
       sx={{ flexGrow: 1, p: 3 }}
     >
-      {state.filteredTabledata.length > 0 && (
+      {/* //{state.filteredTabledata.length > 0 && ( */}
         <React.Fragment>
           <FilterBar
             tableData={state.tableData}
@@ -141,7 +141,7 @@ export default function BasicTextFields() {
 
           <HomePageTable rows={state.filteredTabledata} />
         </React.Fragment>
-      )}
+      {/* )} */}
     </Box>
   ) : (
     <Loading />

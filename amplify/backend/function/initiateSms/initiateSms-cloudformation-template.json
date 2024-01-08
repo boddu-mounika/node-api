@@ -18,12 +18,6 @@
     },
     "secretsPathAmplifyAppId": {
       "Type": "String"
-    },
-    "relevancyCheckPrompt": {
-      "Type": "String"
-    },
-    "chatgptPromptAnswer": {
-      "Type": "String"
     }
   },
   "Conditions": {
@@ -56,12 +50,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "sms",
+            "initiateSms",
             {
               "Fn::Join": [
                 "",
                 [
-                  "sms",
+                  "initiateSms",
                   "-",
                   {
                     "Ref": "env"
@@ -93,7 +87,7 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "sms"
+                        "functionName": "initiateSms"
                       }
                     ]
                   },
@@ -115,41 +109,13 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "sms"
+                        "functionName": "initiateSms"
                       }
                     ]
                   },
                   "DB_PASS"
                 ]
               ]
-            },
-            "cgkey": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Fn::Sub": [
-                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
-                      {
-                        "appId": {
-                          "Ref": "secretsPathAmplifyAppId"
-                        },
-                        "env": {
-                          "Ref": "env"
-                        },
-                        "functionName": "sms"
-                      }
-                    ]
-                  },
-                  "cgkey"
-                ]
-              ]
-            },
-            "RELEVANCY_CHECK_PROMPT": {
-              "Ref": "relevancyCheckPrompt"
-            },
-            "CHATGPT_PROMPT_ANSWER": {
-              "Ref": "chatgptPromptAnswer"
             }
           }
         },
@@ -170,12 +136,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "nodeapiLambdaRole2a80e4ba",
+            "nodeapiLambdaRoled3cff557",
             {
               "Fn::Join": [
                 "",
                 [
-                  "nodeapiLambdaRole2a80e4ba",
+                  "nodeapiLambdaRoled3cff557",
                   "-",
                   {
                     "Ref": "env"
@@ -287,7 +253,7 @@
                           "env": {
                             "Ref": "env"
                           },
-                          "functionName": "sms"
+                          "functionName": "initiateSms"
                         }
                       ]
                     },
